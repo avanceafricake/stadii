@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 
 import { Container } from './primitives';
@@ -40,11 +41,24 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-outline-subtle bg-surface/95 backdrop-blur">
       <Container>
         <div className="flex flex-wrap items-center justify-between gap-sm py-sm">
-          <Link
-            href={routes.home()}
-            className="text-title font-bold tracking-tight text-brand-800"
-          >
-            {site.name}
+          <Link href={routes.home()} className="flex items-center" aria-label={site.name}>
+            {/*
+              `priority` because this is above the fold on every page and is the
+              one image a visitor sees before anything else has loaded. The
+              intrinsic size is the file's; `h-9 w-auto` is what actually
+              renders, so the browser can reserve the row before it arrives.
+            */}
+            <Image
+              src="/brand/logo-landscape.png"
+              alt={site.name}
+              width={900}
+              height={226}
+              priority
+              // h-9 renders the lockup's "SCAN • BOOK • ENJOY" line at about
+              // four pixels, which is noise rather than type. h-12 is the
+              // smallest size at which the whole lockup still reads.
+              className="h-10 w-auto sm:h-12"
+            />
           </Link>
 
           <nav aria-label="Primary" className="order-3 w-full sm:order-2 sm:w-auto">
@@ -82,7 +96,13 @@ export function SiteFooter() {
       <Container>
         <div className="grid gap-lg py-xl sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <p className="text-title font-bold text-brand-800">{site.name}</p>
+            <Image
+              src="/brand/logo-landscape.png"
+              alt={site.name}
+              width={900}
+              height={226}
+              className="h-8 w-auto"
+            />
             <p className="mt-sm max-w-prose text-body text-ink-muted">{site.tagline}</p>
             <p className="mt-sm text-caption text-ink-subtle">
               All times are shown in {site.timezone.replace('_', ' ')} (EAT).

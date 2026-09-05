@@ -63,7 +63,11 @@ export function buildMetadata(input: PageMetadataInput): Metadata {
       ...(input.publishedTime ? { publishedTime: input.publishedTime } : {}),
     },
     twitter: {
-      card: images ? 'summary_large_image' : 'summary',
+      // Always the large card. This used to fall back to 'summary' when a page
+      // supplied no image of its own, which was right when there was no default
+      // — there is one now (`src/app/twitter-image.png`, 1200x630), and
+      // 'summary' would crop that brand card into a small square thumbnail.
+      card: 'summary_large_image',
       title: input.title,
       description,
       ...(images ? { images: images.map((i) => i.url) } : {}),
