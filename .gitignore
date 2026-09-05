@@ -1,0 +1,12 @@
+node_modules/
+.next/
+dist/
+.turbo/
+.vercel/
+coverage/
+*.tsbuildinfo
+
+# Local configuration. `.env.example` is the documented template.
+.env
+.env.*
+!.env.example

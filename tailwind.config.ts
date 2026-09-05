@@ -1,0 +1,164 @@
+/**
+ * Tailwind theme, derived from `@stadii/design-tokens`.
+ *
+ * THE RULE: this file is the ONLY place in the app where a colour literal may
+ * appear, and even here every literal comes from the tokens package. Components
+ * use semantic class names (`bg-brand`, `text-ink-muted`, `bg-sales-onSale`)
+ * and never a hex value.
+ *
+ * The tokens package ships a small brand palette on purpose — five roles, not
+ * fifty shades. A usable web surface needs tints and shades of those roles, so
+ * they are DERIVED here by mixing the token toward white or black. Derivation
+ * in one place keeps a single source of truth: change `BRAND.primary` in the
+ * tokens package and every tint moves with it.
+ */
+import {
+  ADMISSION_COLOURS,
+  BRAND,
+  RADIUS,
+  SEAT_STATE_COLOURS,
+  SPACING,
+  TYPE_SCALE,
+} from '@stadii/design-tokens';
+import type { Config } from 'tailwindcss';
+
+// ---------------------------------------------------------------------------
+// Colour derivation. Pure sRGB channel mixing — no perceptual model, because
+// the goal is a consistent family around a token, not a new palette.
+// ---------------------------------------------------------------------------
+
+type Rgb = readonly [number, number, number];
+
+function parseHex(hex: string): Rgb {
+  const value = hex.replace('#', '');
+  return [
+    Number.parseInt(value.slice(0, 2), 16),
+    Number.parseInt(value.slice(2, 4), 16),
+    Number.parseInt(value.slice(4, 6), 16),
+  ] as const;
+}
+
+function toHex(rgb: Rgb): string {
+  return `#${rgb.map((c) => Math.round(c).toString(16).padStart(2, '0')).join('')}`;
+}
+
+/** `amount` 0 keeps `from`, 1 becomes `to`. */
+function mix(from: string, to: string, amount: number): string {
+  const a = parseHex(from);
+  const b = parseHex(to);
+  return toHex([
+    a[0] + (b[0] - a[0]) * amount,
+    a[1] + (b[1] - a[1]) * amount,
+    a[2] + (b[2] - a[2]) * amount,
+  ]);
+}
+
+const WHITE = BRAND.surface;
+const BLACK = BRAND.onSurface;
+
+/** A 50-900 family around one token colour. */
+function family(base: string) {
+  return {
+    50: mix(base, WHITE, 0.95),
+    100: mix(base, WHITE, 0.88),
+    200: mix(base, WHITE, 0.74),
+    300: mix(base, WHITE, 0.56),
+    400: mix(base, WHITE, 0.32),
+    500: base,
+    600: mix(base, BLACK, 0.14),
+    700: mix(base, BLACK, 0.3),
+    800: mix(base, BLACK, 0.48),
+    900: mix(base, BLACK, 0.66),
+    DEFAULT: base,
+  };
+}
+
+/** Neutrals are derived from the token outline and ink, never invented greys. */
+const neutral = {
+  0: BRAND.surface,
+  50: mix(BRAND.outline, WHITE, 0.9),
+  100: mix(BRAND.outline, WHITE, 0.72),
+  200: mix(BRAND.outline, WHITE, 0.45),
+  300: BRAND.outline,
+  400: mix(BRAND.outline, BLACK, 0.25),
+  500: mix(BRAND.outline, BLACK, 0.45),
+  600: mix(BRAND.outline, BLACK, 0.62),
+  700: mix(BRAND.outline, BLACK, 0.78),
+  800: mix(BRAND.outline, BLACK, 0.9),
+  900: BRAND.onSurface,
+};
+
+const px = (n: number) => `${n / 16}rem`;
+
+const config: Config = {
+  content: ['./src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        brand: family(BRAND.primary),
+        'on-brand': BRAND.onPrimary,
+        surface: {
+          DEFAULT: BRAND.surface,
+          sunken: neutral[50],
+          raised: BRAND.surface,
+        },
+        ink: {
+          DEFAULT: BRAND.onSurface,
+          muted: neutral[600],
+          subtle: neutral[500],
+          inverse: BRAND.onPrimary,
+        },
+        outline: {
+          DEFAULT: BRAND.outline,
+          strong: neutral[400],
+          subtle: neutral[200],
+        },
+        neutral,
+        // Seat-map and admission tokens are shared with the Flutter clients so
+        // that HELD is the same yellow on every device (design_tokens header).
+        seat: SEAT_STATE_COLOURS,
+        admission: ADMISSION_COLOURS,
+      },
+      spacing: {
+        xs: px(SPACING.xs),
+        sm: px(SPACING.sm),
+        md: px(SPACING.md),
+        lg: px(SPACING.lg),
+        xl: px(SPACING.xl),
+        xxl: px(SPACING.xxl),
+      },
+      borderRadius: {
+        sm: px(RADIUS.sm),
+        md: px(RADIUS.md),
+        lg: px(RADIUS.lg),
+        pill: `${RADIUS.pill}px`,
+      },
+      fontSize: {
+        caption: [px(TYPE_SCALE.caption), { lineHeight: '1.4' }],
+        body: [px(TYPE_SCALE.body), { lineHeight: '1.6' }],
+        'body-lg': [px(TYPE_SCALE.bodyLarge), { lineHeight: '1.6' }],
+        title: [px(TYPE_SCALE.title), { lineHeight: '1.3' }],
+        headline: [px(TYPE_SCALE.headline), { lineHeight: '1.2' }],
+        display: [px(TYPE_SCALE.display), { lineHeight: '1.05' }],
+      },
+      fontFamily: {
+        sans: [
+          'system-ui',
+          '-apple-system',
+          'Segoe UI',
+          'Roboto',
+          'Helvetica Neue',
+          'Arial',
+          'sans-serif',
+        ],
+      },
+      maxWidth: {
+        content: '72rem',
+        prose: '46rem',
+      },
+    },
+  },
+  plugins: [],
+};
+
+export default config;
