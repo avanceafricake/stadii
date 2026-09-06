@@ -15,12 +15,19 @@ import type { Event } from '@stadii/shared-models';
 import { cx } from './primitives';
 import { allAxes, type AxisPresentation, type Tone } from '@/lib/format/status';
 
+/**
+ * The status palette, used identically everywhere a state is shown.
+ *
+ * Positive is the brand green and information the brand blue, because a
+ * confirmed thing and a primary action mean the same to a reader. Caution and
+ * critical get their own hues precisely so they cannot be mistaken for either.
+ */
 const TONE_CLASSES: Record<Tone, string> = {
   neutral: 'border-outline bg-neutral-50 text-ink-muted',
-  positive: 'border-brand-200 bg-brand-50 text-brand-800',
-  info: 'border-outline bg-surface text-ink',
-  caution: 'border-outline-strong bg-neutral-100 text-ink',
-  critical: 'border-admission-DENY bg-surface text-admission-DENY',
+  positive: 'border-action-200 bg-action-50 text-action-800',
+  info: 'border-info-200 bg-info-50 text-info-800',
+  caution: 'border-status-warning/40 bg-status-warning/10 text-status-warning',
+  critical: 'border-status-error/40 bg-status-error/10 text-status-error',
 };
 
 export function StatusBadge({ axis }: { axis: AxisPresentation }) {

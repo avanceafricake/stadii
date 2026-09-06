@@ -20,7 +20,7 @@ export function PurchaseCta({ event }: { event: Event }) {
   const entry = purchaseEntryPoint(event);
 
   return (
-    <Card className="bg-brand-50">
+    <Card className="bg-action-50 border-action-200">
       <h2 className="text-title font-semibold text-ink">Tickets</h2>
       <p className="mt-xs text-body text-ink-muted">{entry.note}</p>
 

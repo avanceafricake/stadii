@@ -90,7 +90,7 @@ export default async function SearchPage({
           />
           <button
             type="submit"
-            className="rounded-md bg-brand px-lg py-sm text-body-lg font-semibold text-on-brand hover:bg-brand-600"
+            className="rounded-md bg-action px-lg py-sm text-body-lg font-semibold text-on-action hover:bg-action-600"
           >
             Search
           </button>

@@ -127,11 +127,22 @@ export function Grid({
   );
 }
 
-type ButtonTone = 'primary' | 'secondary';
+type ButtonTone = 'primary' | 'secondary' | 'dark';
 
+/**
+ * Three tones, and the choice between them is a meaning rather than a taste.
+ *
+ * `primary` is the green: the one thing on the page a visitor is meant to do.
+ * `secondary` is blue where it is a real alternative action, and quiet where
+ * it is merely another way out. `dark` is the deep teal, for an action sitting
+ * on a light surface that needs to read as the brand rather than as a CTA.
+ *
+ * If a screen has two green buttons, one of them is wrong.
+ */
 const BUTTON_CLASSES: Record<ButtonTone, string> = {
-  primary: 'bg-brand text-on-brand hover:bg-brand-600',
+  primary: 'bg-action text-on-action hover:bg-action-600 focus-visible:outline-action-700',
   secondary: 'border border-outline-strong bg-surface text-ink hover:bg-surface-sunken',
+  dark: 'bg-brand text-on-brand hover:bg-brand-700',
 };
 
 export function ButtonLink({

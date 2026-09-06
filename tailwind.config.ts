@@ -17,6 +17,7 @@ import {
   BRAND,
   RADIUS,
   SEAT_STATE_COLOURS,
+  STATUS_COLOURS,
   SPACING,
   TYPE_SCALE,
 } from '@stadii/design-tokens';
@@ -95,16 +96,24 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Three roles, and they are not interchangeable. `brand` is identity
+        // and carries headings and dark surfaces; `action` is the green that
+        // means "press this" and stays rare enough to keep meaning it; `info`
+        // is blue and carries links and supporting data.
         brand: family(BRAND.primary),
         'on-brand': BRAND.onPrimary,
+        action: family(BRAND.action),
+        'on-action': BRAND.onAction,
+        info: family(BRAND.info),
+        'on-info': BRAND.onInfo,
         surface: {
           DEFAULT: BRAND.surface,
-          sunken: neutral[50],
+          sunken: BRAND.background,
           raised: BRAND.surface,
         },
         ink: {
           DEFAULT: BRAND.onSurface,
-          muted: neutral[600],
+          muted: BRAND.onSurfaceMuted,
           subtle: neutral[500],
           inverse: BRAND.onPrimary,
         },
@@ -114,6 +123,13 @@ const config: Config = {
           subtle: neutral[200],
         },
         neutral,
+        status: {
+          success: STATUS_COLOURS.SUCCESS,
+          info: STATUS_COLOURS.INFO,
+          warning: STATUS_COLOURS.WARNING,
+          error: STATUS_COLOURS.ERROR,
+          neutral: STATUS_COLOURS.NEUTRAL,
+        },
         // Seat-map and admission tokens are shared with the Flutter clients so
         // that HELD is the same yellow on every device (design_tokens header).
         seat: SEAT_STATE_COLOURS,
@@ -126,6 +142,17 @@ const config: Config = {
         lg: px(SPACING.lg),
         xl: px(SPACING.xl),
         xxl: px(SPACING.xxl),
+      },
+      // Shadows are the deep teal at low opacity, never black. Pure black over
+      // a warm neutral reads as dirt rather than depth, and a ticketing app
+      // that leans on elevation reads as cheap. One shadow per surface, never
+      // stacked.
+      boxShadow: {
+        none: 'none',
+        sm: '0 1px 2px 0 rgb(0 51 51 / 0.05)',
+        DEFAULT: '0 1px 10px 0 rgb(0 51 51 / 0.05)',
+        md: '0 4px 18px 0 rgb(0 51 51 / 0.08)',
+        lg: '0 8px 28px 0 rgb(0 51 51 / 0.10)',
       },
       borderRadius: {
         sm: px(RADIUS.sm),
