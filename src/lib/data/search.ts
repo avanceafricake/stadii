@@ -44,7 +44,13 @@ export function normaliseQuery(raw: string | undefined): string {
   return (raw ?? '').replace(/\s+/g, ' ').trim().slice(0, 100);
 }
 
-function matches(query: string, ...fields: (string | undefined)[]): boolean {
+/**
+ * Exported so the alias behaviour can be tested without standing up Firestore.
+ *
+ * A venue's other names matter precisely because people search for what they
+ * call a place, not for what it was renamed to.
+ */
+export function matches(query: string, ...fields: (string | undefined)[]): boolean {
   const needle = query.toLowerCase();
   return fields.some((field) => (field ?? '').toLowerCase().includes(needle));
 }
@@ -97,7 +103,13 @@ export async function searchCatalogue(rawQuery: string | undefined): Promise<Sea
     matches(query, competition.name),
   );
   const matchedVenues = venues.data.filter((venue) =>
-    matches(query, venue.name, venue.address?.city, venue.address?.county),
+    matches(
+      query,
+      venue.name,
+      ...(venue.alsoKnownAs ?? []),
+      venue.address?.city,
+      venue.address?.county,
+    ),
   );
 
   return {

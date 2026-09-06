@@ -106,6 +106,19 @@ export interface Venue extends Timestamped, Versioned, Attributed {
   readonly id: VenueId;
   readonly organizationId: OrgId;
   readonly name: string;
+  /**
+   * Names this venue is still called by, for SEARCH only.
+   *
+   * Kenyan grounds get renamed and the old name outlives the change by years:
+   * the 60,000-seat national stadium is officially Raila Odinga International
+   * Stadium and everyone still says Talanta. Kasarani has been Safaricom
+   * Stadium on a sponsor's signage.
+   *
+   * Never displayed as the venue's name and never authoritative — `name` is
+   * the current official one. This exists so a person typing what they call
+   * the place finds it, which is the only reason a former name matters.
+   */
+  readonly alsoKnownAs?: readonly string[];
   readonly slug: string;
   readonly address: Address;
   /**
