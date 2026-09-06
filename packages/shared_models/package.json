@@ -11,6 +11,6 @@
     "test": "echo \"no tests in shared-models\""
   },
   "dependencies": {
-    "@stadii/shared-constants": "workspace:*"
+    "@stadii/shared-constants": "*"
   }
 }
