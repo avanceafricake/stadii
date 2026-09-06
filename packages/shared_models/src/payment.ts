@@ -34,6 +34,11 @@ export const PROVIDER_IDS = {
 
 export interface Payment extends Timestamped, Versioned {
   readonly id: PaymentId;
+  /**
+   * `STD-PAY-7K4M2X-01` — quotable, and sharing its order's body so an agent
+   * given one knows the other (domain/common/reference.ts).
+   */
+  readonly reference: string;
   readonly orderId: OrderId;
   /** Denormalised for reconciliation queries */
   readonly eventId: EventId;
@@ -103,6 +108,8 @@ export interface NormalizedPaymentEvent {
  */
 export interface Refund extends Timestamped, Versioned {
   readonly id: RefundId;
+  /** `STD-RFD-7K4M2X-01` — see Payment.reference. */
+  readonly reference: string;
   readonly orderId: OrderId;
   readonly paymentId: PaymentId;
   readonly ticketIds: readonly TicketId[];

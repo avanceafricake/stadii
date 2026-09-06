@@ -20,6 +20,16 @@ export const COLLECTIONS = {
 
   // Venue
   VENUES: 'venues',
+  /**
+   * Administrative areas venues sit in — Kenya's counties today.
+   *
+   * A collection rather than a string on the address because it is REFERENCED:
+   * a county page lists its venues, and "venues in Nakuru" is a query rather
+   * than a string comparison. Only counties that actually hold a venue exist;
+   * a gazetteer of all 47 with nothing in them would be data that relates to
+   * nothing.
+   */
+  COUNTIES: 'counties',
 
   // Event
   EVENTS: 'events',

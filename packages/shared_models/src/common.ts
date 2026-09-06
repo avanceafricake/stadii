@@ -25,6 +25,7 @@ export type ParticipantId = Brand<string, 'ParticipantId'>;
 export type CompetitionId = Brand<string, 'CompetitionId'>;
 export type SeasonId = Brand<string, 'SeasonId'>;
 export type VenueId = Brand<string, 'VenueId'>;
+export type CountyId = Brand<string, 'CountyId'>;
 export type AreaId = Brand<string, 'AreaId'>;
 export type SeatId = Brand<string, 'SeatId'>;
 export type GateId = Brand<string, 'GateId'>;

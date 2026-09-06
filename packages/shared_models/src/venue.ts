@@ -4,6 +4,7 @@ import type {
   AccessibilityFeature,
   AreaKind,
   AreaStatus,
+  CatalogStatus,
   GateStatus,
   SeatStatus,
   VenueStatus,
@@ -12,10 +13,12 @@ import type {
   Address,
   AreaId,
   Attributed,
+  CountyId,
   GateId,
   GeoPoint,
   OrgId,
   SeatId,
+  SportId,
   Timestamped,
   VenueId,
   Versioned,
@@ -105,6 +108,24 @@ export interface Venue extends Timestamped, Versioned, Attributed {
   readonly name: string;
   readonly slug: string;
   readonly address: Address;
+  /**
+   * The administrative area, as a REFERENCE rather than the free string on
+   * `address.county`.
+   *
+   * The address stays for display and postal use; this is what makes "venues
+   * in Nakuru" a query and lets a county carry its own page. Optional because
+   * a venue outside Kenya has no county.
+   */
+  readonly countyId?: CountyId;
+  /**
+   * The sports this venue is equipped for.
+   *
+   * A property of the GROUND, not of any event: the Kasarani Aquatic Stadium
+   * has a diving platform whether or not anything is scheduled. It is what
+   * makes "where can I watch rugby" answerable before a single fixture is
+   * published.
+   */
+  readonly sportIds?: readonly SportId[];
   readonly location?: GeoPoint;
   readonly timezone: string;
   readonly totalCapacity?: number;
@@ -115,6 +136,25 @@ export interface Venue extends Timestamped, Versioned, Attributed {
    */
   readonly layoutVersion: number;
   readonly status: VenueStatus;
+}
+
+/**
+ * An administrative area a venue sits in.
+ *
+ * Deliberately thin. It exists to be REFERENCED — by venues now, and by
+ * anything later that needs to group by place — not to be a gazetteer. A
+ * county with no venue in it is not created, because data that relates to
+ * nothing is a maintenance cost with no reader.
+ */
+export interface County extends Timestamped, Versioned {
+  readonly id: CountyId;
+  readonly name: string;
+  readonly slug: string;
+  /** ISO 3166-2 subdivision code where one is known, e.g. "KE-30". */
+  readonly code?: string;
+  /** ISO 3166-1 alpha-2 of the country it belongs to. */
+  readonly countryCode: string;
+  readonly status: CatalogStatus;
 }
 
 /** Denormalised display copy carried on an event. Never authoritative. */

@@ -4,6 +4,7 @@ import type { Venue, VenueArea } from '@stadii/shared-models';
 
 import { Card } from './primitives';
 import { routes } from '@/lib/routes';
+import { placeLine } from '@/lib/format/format';
 
 /**
  * Where the event is, and how to get there.
@@ -35,8 +36,7 @@ export function VenueAddress({ venue }: { venue: Venue }) {
     <address className="not-italic text-body text-ink-muted">
       {venue.address.line1}
       <br />
-      {venue.address.city}
-      {venue.address.county ? `, ${venue.address.county}` : ''}
+      {placeLine(venue.address.city, venue.address.county)}
       <br />
       {venue.address.countryCode}
     </address>

@@ -106,6 +106,13 @@ export interface SettlementLine {
  */
 export interface Settlement extends Timestamped, Versioned {
   readonly id: SettlementId;
+  /**
+   * `STD-STL-4Q8N2P` — what an organizer quotes when querying a payout.
+   *
+   * Minted from the settlement's own id rather than an order's: a run covers
+   * many orders and belongs to none of them.
+   */
+  readonly reference: string;
   readonly organizationId: OrgId;
   /** Per-event, or period-based across events */
   readonly eventId?: EventId;

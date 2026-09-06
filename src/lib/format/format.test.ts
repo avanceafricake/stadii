@@ -23,6 +23,7 @@ import {
   schemaTypeForKind,
 } from './participants';
 import * as moneyModule from './money';
+import { placeLine } from './format';
 
 describe('money is formatted, never computed', () => {
   it('renders integer minor units as major units', () => {
@@ -143,5 +144,29 @@ describe('an event has N participants, not two sides', () => {
     expect(kindLabel('TEAM')).toBe('Team');
     expect(kindLabel('ATHLETE')).toBe('Athlete');
     expect(kindLabel('SOMETHING_NEW')).toBe('');
+  });
+});
+
+describe('placeLine', () => {
+  it('does not print the same name twice', () => {
+    // The bug this exists for: half of Kenya's counties share a name with
+    // their principal town, and "Nakuru, Nakuru" reads as a rendering fault.
+    expect(placeLine('Nakuru', 'Nakuru')).toBe('Nakuru');
+    expect(placeLine('Nairobi', 'Nairobi')).toBe('Nairobi');
+  });
+
+  it('keeps the county when it adds something', () => {
+    expect(placeLine('Awendo', 'Migori')).toBe('Awendo, Migori');
+    expect(placeLine('Thika', 'Kiambu')).toBe('Thika, Kiambu');
+  });
+
+  it('ignores case and stray whitespace when comparing', () => {
+    expect(placeLine('Kisii', ' kisii ')).toBe('Kisii');
+  });
+
+  it('copes with either half missing', () => {
+    expect(placeLine('Eldoret', undefined)).toBe('Eldoret');
+    expect(placeLine(undefined, 'Uasin Gishu')).toBe('Uasin Gishu');
+    expect(placeLine(undefined, undefined)).toBe('');
   });
 });

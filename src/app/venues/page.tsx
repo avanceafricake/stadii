@@ -7,6 +7,7 @@ import { Card, Container, PageHeader, Section } from '@/components/primitives';
 import { listVenues } from '@/lib/firestore/queries';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
+import { placeLine } from '@/lib/format/format';
 
 export const revalidate = 3600;
 
@@ -54,8 +55,8 @@ export default async function VenuesPage() {
                       </Link>
                     </h2>
                     <p className="mt-xs text-body text-ink-muted">
-                      {venue.address?.city}
-                      {venue.address?.county ? `, ${venue.address.county}` : ''}
+                      {placeLine(venue.address?.city, venue.address?.county)}
+
                     </p>
                     {typeof venue.totalCapacity === 'number' ? (
                       <p className="mt-xs text-caption text-ink-subtle">
