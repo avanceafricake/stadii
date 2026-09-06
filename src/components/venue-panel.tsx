@@ -4,7 +4,7 @@ import type { Venue, VenueArea } from '@stadii/shared-models';
 
 import { Card } from './primitives';
 import { routes } from '@/lib/routes';
-import { placeLine } from '@/lib/format/format';
+import { addressParts, placeLine } from '@/lib/format/format';
 
 /**
  * Where the event is, and how to get there.
@@ -19,7 +19,7 @@ function directionsUrl(venue: Venue): string {
   if (venue.location) {
     return `https://www.google.com/maps/search/?api=1&query=${venue.location.lat},${venue.location.lng}`;
   }
-  const parts = [venue.name, venue.address?.line1, venue.address?.city].filter(Boolean);
+  const parts = addressParts(venue.name, venue.address?.line1, venue.address?.city);
   return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(parts.join(', '))}`;
 }
 

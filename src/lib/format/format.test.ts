@@ -23,7 +23,7 @@ import {
   schemaTypeForKind,
 } from './participants';
 import * as moneyModule from './money';
-import { placeLine } from './format';
+import { addressParts, placeLine } from './format';
 
 describe('money is formatted, never computed', () => {
   it('renders integer minor units as major units', () => {
@@ -168,5 +168,31 @@ describe('placeLine', () => {
     expect(placeLine('Eldoret', undefined)).toBe('Eldoret');
     expect(placeLine(undefined, 'Uasin Gishu')).toBe('Uasin Gishu');
     expect(placeLine(undefined, undefined)).toBe('');
+  });
+});
+
+describe('addressParts', () => {
+  it('drops a repeat, so a maps query is not "Nakuru, Nakuru"', () => {
+    // A venue with no recorded locality stores the town as line1, because
+    // line1 is required. Joining naively repeats it.
+    expect(addressParts('Afraha Stadium', 'Nakuru', 'Nakuru')).toEqual([
+      'Afraha Stadium',
+      'Nakuru',
+    ]);
+  });
+
+  it('keeps genuinely different parts, in order', () => {
+    expect(addressParts('Kasarani Indoor Arena', 'Kasarani', 'Nairobi')).toEqual([
+      'Kasarani Indoor Arena',
+      'Kasarani',
+      'Nairobi',
+    ]);
+  });
+
+  it('skips blanks and undefined', () => {
+    expect(addressParts('Gusii Stadium', undefined, '  ', 'Kisii')).toEqual([
+      'Gusii Stadium',
+      'Kisii',
+    ]);
   });
 });
