@@ -150,7 +150,13 @@ export const listUpcomingEvents = cache(
         query(
           collection(requireDb(), COLLECTIONS.EVENTS),
           ...PUBLIC_EVENT_CONSTRAINTS,
-          where('startsAt', '>=', new Date(from)),
+          // A NUMBER, not a Date. `Instant` is epoch milliseconds
+          // (shared-models/common.ts) and the backend writes `startsAt` as one,
+          // so comparing against a Firestore Timestamp here matched nothing —
+          // Firestore does not order a number against a timestamp, it simply
+          // returns neither. The public events list was permanently empty for
+          // every event the backend had ever created.
+          where('startsAt', '>=', from),
           orderBy('startsAt', 'asc'),
           limitTo(LISTING_PAGE_SIZE),
         ),

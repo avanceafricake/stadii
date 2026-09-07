@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 
 import './globals.css';
 import { JsonLdScript } from '@/components/json-ld';
-import { SiteFooter, SiteHeader } from '@/components/site-chrome';
+import { StadiiFooter, StadiiHeader, StadiiMobileNav } from '@/components/shell';
 import { organizationJsonLd, webSiteJsonLd } from '@/lib/seo/jsonld';
 import { site } from '@/lib/site';
 
@@ -35,15 +35,16 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-KE">
-      <body className="flex min-h-screen flex-col">
+      <body className="flex min-h-screen flex-col bg-surface-sunken">
         <a href="#main" className="skip-link">
           Skip to content
         </a>
-        <SiteHeader />
+        <StadiiHeader />
         <main id="main" className="flex-1">
           {children}
         </main>
-        <SiteFooter />
+        <StadiiMobileNav />
+        <StadiiFooter />
         {/* Site-level structured data, emitted once. Page-level SportsEvent and
             BreadcrumbList markup is emitted by the pages themselves. */}
         <JsonLdScript id="ld-site" data={[organizationJsonLd(), webSiteJsonLd()]} />
