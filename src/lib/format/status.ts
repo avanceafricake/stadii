@@ -227,13 +227,13 @@ export function purchaseEntryPoint(event: {
     case EVENT_SALES_STATUS.ON_SALE:
       return {
         offer: true,
-        label: 'Get tickets in the app',
+        label: 'Buy now',
         note: 'Prices shown are per ticket. Any booking fee is added and confirmed at checkout.',
       };
     case EVENT_SALES_STATUS.SOLD_OUT:
       return {
         offer: true,
-        label: 'Check for returns in the app',
+        label: 'Check for returns',
         note: 'Listed as sold out. Released holds and refunds can put tickets back, so the app checks live.',
       };
     case EVENT_SALES_STATUS.NOT_YET_OPEN:

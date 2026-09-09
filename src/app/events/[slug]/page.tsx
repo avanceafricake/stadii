@@ -2,16 +2,15 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { EventStatusDetail } from '@/components/event-status';
 import { JsonLdScript } from '@/components/json-ld';
-import { ParticipantList } from '@/components/participants';
 import { EventHero } from '@/components/cards';
 import { Section, SectionHeading } from '@/components/primitives';
 import { StadiiShell } from '@/components/shell';
-import { PurchaseCta } from '@/components/purchase-cta';
+import { GetTheAppPanel, PurchaseCta, StickyBuyBar } from '@/components/purchase-cta';
 import { UnavailableState } from '@/components/states';
 import { PriceFootnote, TicketCategoryList } from '@/components/ticket-categories';
 import { VenuePanel } from '@/components/venue-panel';
+import { appLinks } from '@/lib/app-links';
 import { loadEventPage } from '@/lib/data/event-page';
 import {
   formatEventDate,
@@ -20,7 +19,7 @@ import {
   toIsoWithZoneOffset,
 } from '@/lib/format/datetime';
 import { participantSummaryLine } from '@/lib/format/participants';
-import { noteworthyAxes } from '@/lib/format/status';
+import { noteworthyAxes, purchaseEntryPoint } from '@/lib/format/status';
 import { routes, parseSlug } from '@/lib/routes';
 import { sportsEventJsonLd } from '@/lib/seo/jsonld';
 import { buildMetadata } from '@/lib/seo/metadata';
@@ -95,6 +94,7 @@ export default async function EventPage({ params }: Params) {
     { name: event.title, path },
   ];
 
+  const entry = purchaseEntryPoint(event);
   const sides = (event.participantSummaries ?? []).map((summary) => ({
     name: summary.displayName,
     crestUrl: summary.crestUrl,
@@ -152,10 +152,10 @@ export default async function EventPage({ params }: Params) {
       />
 
       <div className="space-y-xl">
-        <Section className="py-0" labelledBy="event-participants">
-          <SectionHeading id="event-participants">Who is taking part</SectionHeading>
-          <ParticipantList participants={data.participants} />
-        </Section>
+        {/* No "Who is taking part". It repeated the hero directly above it —
+            the same two clubs, the same crests — to convey one word each,
+            "home" and "away". Those words are now small type under the names
+            in the hero, which is the size that fact is worth. */}
 
         {event.description ? (
           <Section className="py-0" labelledBy="event-about">
@@ -167,22 +167,24 @@ export default async function EventPage({ params }: Params) {
         ) : null}
 
         <Section className="py-0" labelledBy="event-tickets">
-          <SectionHeading id="event-tickets">Ticket categories</SectionHeading>
-          <TicketCategoryList ticketTypes={data.ticketTypes} />
+          <SectionHeading id="event-tickets">Tickets</SectionHeading>
+          <TicketCategoryList
+            ticketTypes={data.ticketTypes}
+            buyHref={entry.offer ? appLinks.selectTickets(event.id) : undefined}
+          />
           <PriceFootnote />
-            </Section>
-
-        <Section className="py-0" labelledBy="event-status">
-          <SectionHeading id="event-status">Status</SectionHeading>
-          <EventStatusDetail event={event} />
-          <p className="mt-sm max-w-prose text-caption text-ink-subtle">
-                STADII tracks three things about an event separately: whether it is
-                published, whether it is going ahead, and whether tickets are selling.
-                They change independently — sales can be paused on a match that is very
-                much still on.
-              </p>
         </Section>
+
+        {/* No "Status" panel. It was three rows and roughly 400px to say
+            "Scheduled / On sale / Published", which is the ordinary case for
+            everything this site can show — an unpublished event is not listed
+            at all. Anything NOT ordinary is a badge in the hero, where it is
+            read before the price rather than after it (`noteworthyAxes`). */}
+
+        <GetTheAppPanel />
       </div>
+
+      <StickyBuyBar event={event} />
     </StadiiShell>
   );
 }

@@ -42,7 +42,14 @@ const CATEGORY_NOTE: Partial<Record<TicketTypeStatus, string>> = {
   [TICKET_TYPE_STATUS.DRAFT]: 'Not yet available',
 };
 
-export function TicketCategoryList({ ticketTypes }: { ticketTypes: readonly TicketType[] }) {
+export function TicketCategoryList({
+  ticketTypes,
+  buyHref,
+}: {
+  ticketTypes: readonly TicketType[];
+  /** Where "Buy" goes. Omitted when the event is not selling. */
+  buyHref?: string;
+}) {
   if (ticketTypes.length === 0) {
     return (
       <p className="text-body text-ink-muted">
@@ -56,9 +63,9 @@ export function TicketCategoryList({ ticketTypes }: { ticketTypes: readonly Tick
       {ticketTypes.map((ticketType) => {
         const note = CATEGORY_NOTE[ticketType.status];
         return (
-          <Card as="li" key={ticketType.id}>
-            <div className="flex flex-wrap items-start justify-between gap-sm">
-              <div className="min-w-0">
+          <Card as="li" key={ticketType.id} className="transition-shadow hover:shadow-md">
+            <div className="flex flex-wrap items-start justify-between gap-md">
+              <div className="min-w-0 flex-1">
                 <h3 className="text-body-lg font-semibold text-ink">{ticketType.name}</h3>
                 <p className="mt-xs text-caption uppercase tracking-wide text-ink-subtle">
                   {ADMISSION_LABEL[ticketType.admissionKind] ?? 'Admission'}
@@ -82,12 +89,28 @@ export function TicketCategoryList({ ticketTypes }: { ticketTypes: readonly Tick
                 ) : null}
               </div>
 
-              <p className="shrink-0 text-title font-bold tabular-nums text-ink">
-                {formatMinor(ticketType.priceMinor, ticketType.currency)}
-                <span className="ml-xs block text-caption font-normal text-ink-subtle">
-                  per ticket
-                </span>
-              </p>
+              <div className="flex shrink-0 flex-col items-start gap-sm sm:items-end">
+                <p className="text-title font-bold tabular-nums text-ink">
+                  {formatMinor(ticketType.priceMinor, ticketType.currency)}
+                  <span className="block text-caption font-normal text-ink-subtle sm:text-right">
+                    per ticket
+                  </span>
+                </p>
+
+                {/* The action is on the row it belongs to. A single button at
+                    the bottom of a list of four prices makes the reader hold a
+                    choice in their head while they scroll to act on it — and
+                    the app opens on this exact category. */}
+                {buyHref && !note ? (
+                  <a
+                    href={buyHref}
+                    rel="noopener"
+                    className="inline-flex h-10 items-center justify-center rounded-xl border border-action-200 bg-action-50 px-md text-body font-semibold text-action-800 transition-colors hover:bg-action-100"
+                  >
+                    Buy {ticketType.name}
+                  </a>
+                ) : null}
+              </div>
             </div>
           </Card>
         );

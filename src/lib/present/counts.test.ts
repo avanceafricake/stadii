@@ -12,7 +12,9 @@ import type { Event } from '@stadii/shared-models';
 
 import { eventCountLabel, tally, upcomingLabel } from './counts';
 
-type TestEvent = Partial<Event> & Record<string, unknown>;
+// Loose on purpose. Ids in the model are branded types; a test that has to
+// construct branded ids to check arithmetic is testing the type system.
+type TestEvent = Record<string, unknown>;
 
 const anEvent = (over: TestEvent = {}): Event =>
   ({
