@@ -108,8 +108,11 @@ export function SignInForm() {
 
   const isRegister = mode === 'register';
 
+  // Centred, not left-aligned. A sign-in form is the only thing on its part of
+  // the page and has no column of content to line up with — pinned to the left
+  // margin it reads as the first item in a list that never arrives.
   return (
-    <div className="max-w-md">
+    <div className="mx-auto max-w-md">
       {/* A real segmented control, not two links. Switching mode must not lose
           what has already been typed into the email field. */}
       <div

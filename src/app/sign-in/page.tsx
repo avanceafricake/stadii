@@ -73,7 +73,13 @@ export default function SignInPage() {
           statically prerendered — otherwise the whole page becomes dynamic and
           every visitor waits on a server render for a form that is the same
           markup every time. */}
-      <Suspense fallback={<div className="h-[28rem] max-w-md animate-pulse rounded-xl bg-surface-sunken" />}>
+      <Suspense
+        fallback={
+          // Same width and centring as the form, so hydration does not shift
+          // the page sideways under the reader.
+          <div className="mx-auto h-[28rem] max-w-md animate-pulse rounded-xl bg-surface-sunken" />
+        }
+      >
         <SignInForm />
       </Suspense>
 
