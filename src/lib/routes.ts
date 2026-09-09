@@ -27,6 +27,8 @@ export const routes = {
   privacy: () => '/privacy',
   refunds: () => '/refunds',
   faqs: () => '/faqs',
+  signIn: () => '/sign-in',
+  getApp: () => '/get-the-app',
   claim: (token: string) => `/claim/${encodeURIComponent(token)}`,
 } as const;
 

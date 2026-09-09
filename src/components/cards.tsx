@@ -213,10 +213,31 @@ export function StadiiMatchHero({ match }: { match: FeaturedMatch }) {
  * infers one from position — an event has N participants and no home side
  * (ADR-0004), and a fixture at a neutral ground genuinely has neither.
  */
-function MatchSideBlock({ side, role }: { side?: MatchSide; role?: string }) {
+function MatchSideBlock({
+  side,
+  role,
+  align = 'center',
+}: {
+  side?: MatchSide;
+  role?: string;
+  /**
+   * Which way the side leans about the VS. The two blocks mirror each other so
+   * the crests sit an equal distance from the middle however long the club
+   * names are — "Gor Mahia" and "AFC Leopards" are not the same width, and
+   * centring each block independently pushes the crests apart unevenly.
+   */
+  align?: 'start' | 'center' | 'end';
+}) {
   if (!side) return <div />;
   return (
-    <div className="flex flex-col items-start gap-sm">
+    <div
+      className={cx(
+        'flex flex-col gap-sm',
+        align === 'end' && 'items-end text-right',
+        align === 'start' && 'items-start text-left',
+        align === 'center' && 'items-center text-center',
+      )}
+    >
       <Crest name={side.name} src={side.crestUrl} size={80} />
       <div>
         <p className="text-body-lg font-bold uppercase tracking-wide">{side.name}</p>
@@ -917,15 +938,12 @@ export function EventHero({ event, action }: { event: EventHeroData; action?: Re
           )}
 
           {isMatch ? (
-            // Left, with everything else on the page. Centring it made the one
-            // block on the screen that did not line up with the heading above
-            // it or the date row below it.
-            <div className="mt-lg flex items-start gap-lg sm:gap-xl">
-              <MatchSideBlock side={event.sides![0]} role="Home" />
+            <div className="mt-lg flex items-start justify-center gap-lg sm:gap-xl">
+              <MatchSideBlock side={event.sides![0]} role="Home" align="end" />
               <span className="mt-[1.75rem] rounded-md bg-white/10 px-sm py-xs text-body font-extrabold tracking-widest text-white/85">
                 VS
               </span>
-              <MatchSideBlock side={event.sides![1]} role="Away" />
+              <MatchSideBlock side={event.sides![1]} role="Away" align="start" />
             </div>
           ) : (
             <h1 className="mt-sm max-w-3xl text-headline font-bold tracking-tight">
@@ -934,13 +952,21 @@ export function EventHero({ event, action }: { event: EventHeroData; action?: Re
           )}
 
           {event.subtitle ? (
-            <p className={cx('max-w-prose text-body-lg text-white/75', isMatch ? 'mt-lg' : 'mt-xs')}>
+            <p
+              className={cx(
+                'max-w-prose text-body-lg text-white/75',
+                isMatch ? 'mt-lg text-center' : 'mt-xs',
+              )}
+            >
               {event.subtitle}
             </p>
           ) : null}
 
           {event.notices && event.notices.length > 0 ? (
-            <ul className="mt-md flex flex-wrap gap-xs p-0" aria-label="Event status">
+            <ul
+              className={cx('mt-md flex flex-wrap gap-xs p-0', isMatch && 'justify-center')}
+              aria-label="Event status"
+            >
               {event.notices.map((axis) => (
                 <li key={axis.axis}>
                   <span className="inline-flex items-baseline gap-xs rounded-pill bg-white/12 px-sm py-xs text-caption font-medium text-white">

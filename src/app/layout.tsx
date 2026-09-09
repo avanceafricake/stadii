@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 
 import './globals.css';
 import { JsonLdScript } from '@/components/json-ld';
+import { AuthProvider } from '@/components/auth-provider';
 import { StadiiFooter, StadiiHeader, StadiiMobileNav } from '@/components/shell';
 import { organizationJsonLd, webSiteJsonLd } from '@/lib/seo/jsonld';
 import { site } from '@/lib/site';
@@ -39,12 +40,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="skip-link">
           Skip to content
         </a>
-        <StadiiHeader />
-        <main id="main" className="flex-1">
-          {children}
-        </main>
-        <StadiiMobileNav />
-        <StadiiFooter />
+        {/* Wraps the whole tree so the header and any page can ask who is
+            signed in. It holds an IDENTITY and no capabilities — every command
+            behind it is re-authorized server-side (ADR-0018). */}
+        <AuthProvider>
+          <StadiiHeader />
+          <main id="main" className="flex-1">
+            {children}
+          </main>
+          <StadiiMobileNav />
+          <StadiiFooter />
+        </AuthProvider>
         {/* Site-level structured data, emitted once. Page-level SportsEvent and
             BreadcrumbList markup is emitted by the pages themselves. */}
         <JsonLdScript id="ld-site" data={[organizationJsonLd(), webSiteJsonLd()]} />

@@ -6,7 +6,7 @@ import { JsonLdScript } from '@/components/json-ld';
 import { EventHero } from '@/components/cards';
 import { Section, SectionHeading } from '@/components/primitives';
 import { StadiiShell } from '@/components/shell';
-import { GetTheAppPanel, PurchaseCta, StickyBuyBar } from '@/components/purchase-cta';
+import { PurchaseCta, StickyBuyBar } from '@/components/purchase-cta';
 import { UnavailableState } from '@/components/states';
 import { PriceFootnote, TicketCategoryList } from '@/components/ticket-categories';
 import { VenuePanel } from '@/components/venue-panel';
@@ -180,8 +180,6 @@ export default async function EventPage({ params }: Params) {
             everything this site can show — an unpublished event is not listed
             at all. Anything NOT ordinary is a badge in the hero, where it is
             read before the price rather than after it (`noteworthyAxes`). */}
-
-        <GetTheAppPanel />
       </div>
 
       <StickyBuyBar event={event} />

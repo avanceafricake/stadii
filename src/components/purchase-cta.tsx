@@ -12,9 +12,8 @@
 import type { Event } from '@stadii/shared-models';
 
 import { ButtonLink, Card } from './primitives';
-import { appLinks, hasStoreLinks } from '@/lib/app-links';
+import { appLinks } from '@/lib/app-links';
 import { purchaseEntryPoint } from '@/lib/format/status';
-import { site } from '@/lib/site';
 
 export function PurchaseCta({ event }: { event: Event }) {
   const entry = purchaseEntryPoint(event);
@@ -38,9 +37,9 @@ export function PurchaseCta({ event }: { event: Event }) {
 
       {/* No store buttons here. "Get it on Android" beside "Buy now" asks
           somebody who has decided to buy to make a second, unrelated decision
-          about installing an app — and the two buttons compete for the same
-          click. Getting the app is its own thing and lives in its own panel
-          further down the page (`GetTheAppPanel`). */}
+          about installing an app, and the two compete for the same click.
+          Getting the app is in the header, where somebody looking for it will
+          look for it. */}
       <p className="mt-md text-caption text-ink-subtle">
         Seat availability, your place in a queue and the final amount are all confirmed
         by STADII when you check out. Nothing on this page reserves a ticket.
@@ -85,39 +84,5 @@ export function StickyBuyBar({ event }: { event: Event }) {
         </a>
       </div>
     </>
-  );
-}
-
-/**
- * Where the store links went.
- *
- * They are still worth offering — buying happens in the app — but as their own
- * thing, after the reader has seen what is on sale, rather than as a rival to
- * the buy button. Renders nothing at all until the stores are configured,
- * because a store button that goes nowhere is worse than no store button.
- */
-export function GetTheAppPanel() {
-  if (!hasStoreLinks()) return null;
-
-  return (
-    <Card className="bg-brand text-ink-inverse">
-      <h2 className="text-title font-semibold">Get the STADII app</h2>
-      <p className="mt-xs max-w-prose text-body text-white/75">
-        Buying, your tickets and the QR code at the gate all live in the app. It is
-        also where a ticket is transferred to somebody else.
-      </p>
-      <div className="mt-md flex flex-wrap gap-sm">
-        {site.app.android ? (
-          <ButtonLink href={site.app.android} tone="secondary" external>
-            Android
-          </ButtonLink>
-        ) : null}
-        {site.app.ios ? (
-          <ButtonLink href={site.app.ios} tone="secondary" external>
-            iPhone
-          </ButtonLink>
-        ) : null}
-      </div>
-    </Card>
   );
 }

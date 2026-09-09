@@ -15,6 +15,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { AccountMenu, NotificationsButton } from './account-menu';
 import { StadiiAside } from './aside';
 import { Icon, type IconName } from './icons';
 import { cx } from './primitives';
@@ -70,29 +71,72 @@ export function StadiiHeader() {
             <Icon name="search" />
           </Link>
 
-          {/* A real link, not a decorative bell: it goes where updates live. */}
-          <Link
-            href={routes.help()}
-            aria-label="Updates and help"
-            className="relative inline-flex h-10 w-10 items-center justify-center rounded-md text-ink hover:bg-surface-sunken"
-          >
-            <Icon name="bell" />
-          </Link>
+          {/* Whether a bell renders is a question only the client can answer,
+              so it is asked there. A bell with nothing behind it is furniture
+              pretending to be a feature. */}
+          <NotificationsButton />
 
-          {/* This surface holds no session (ADR-0018), so the account control is
-              honest about being a hand-off rather than pretending to sign in. */}
-          <Link
-            href={routes.howItWorks()}
-            className="inline-flex items-center gap-xs rounded-pill border border-outline px-xs py-xs pr-sm text-body font-medium text-ink hover:bg-surface-sunken"
-          >
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-brand text-ink-inverse">
-              <Icon name="user" className="h-4 w-4" />
-            </span>
-            <span className="hidden sm:inline">Get the app</span>
-          </Link>
+          <GetTheAppButton />
+
+          <AccountMenu />
         </div>
       </div>
     </header>
+  );
+}
+
+/**
+ * "Get the app", pointing at the actual stores.
+ *
+ * It used to link to the how-it-works page, which is not what the words say.
+ * With both platforms configured it is a native disclosure listing them; with
+ * one, it is a direct link to that one; with neither, it does not render at
+ * all — a store button that goes nowhere is worse than no store button, and
+ * this is the header, where a dead control is on every page at once.
+ *
+ * `<details>` rather than a scripted menu: it works before JavaScript arrives
+ * and is keyboard-operable without any of it.
+ */
+function GetTheAppButton() {
+  const stores = [
+    { label: 'Android', href: site.app.android },
+    { label: 'iPhone', href: site.app.ios },
+  ].filter((store) => store.href.length > 0);
+
+  if (stores.length === 0) return null;
+
+  const classes =
+    'inline-flex h-10 cursor-pointer items-center gap-xs rounded-pill border border-outline px-md text-body font-medium text-ink transition-colors hover:bg-surface-sunken';
+
+  if (stores.length === 1) {
+    return (
+      <a href={stores[0]!.href} rel="noopener" target="_blank" className={classes}>
+        <Icon name="qr" className="h-4 w-4" />
+        <span className="hidden sm:inline">Get the app</span>
+      </a>
+    );
+  }
+
+  return (
+    <details className="relative">
+      <summary className={cx(classes, 'list-none marker:hidden')}>
+        <Icon name="qr" className="h-4 w-4" />
+        <span className="hidden sm:inline">Get the app</span>
+      </summary>
+      <div className="absolute right-0 z-50 mt-xs w-44 overflow-hidden rounded-lg border border-outline-subtle bg-surface p-xs shadow-md">
+        {stores.map((store) => (
+          <a
+            key={store.label}
+            href={store.href}
+            rel="noopener"
+            target="_blank"
+            className="block rounded-md px-sm py-sm text-body text-ink hover:bg-surface-sunken"
+          >
+            {store.label}
+          </a>
+        ))}
+      </div>
+    </details>
   );
 }
 
