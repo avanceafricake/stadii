@@ -271,19 +271,28 @@ export function StadiiEventCard({ event }: { event: EventCardData }) {
             <StatusBadge key={axis.axis} axis={axis} />
           ))}
         </div>
-        <h3 className="text-body-lg font-bold leading-snug text-ink">
+        <h3 className="min-h-[3.25rem] text-body-lg font-bold leading-snug text-ink">
           <Link href={routes.event(event.slug)} className="hover:underline">
             {event.title}
           </Link>
         </h3>
 
+        {/* One line, cut with an ellipsis. Four cards across a 824px column
+            gives each about 190px, and "Moi International Sports Centre
+            Kasarani" wraps to three lines at that width — which makes one card
+            in a row of four visibly taller than its neighbours. The full name
+            is on the event page and in the card's own accessible label. */}
         <p className="flex items-center gap-xs text-body text-ink-muted">
           <Icon name="stadium" className="h-4 w-4 shrink-0" />
-          {event.venueName}
+          <span className="min-w-0 truncate" title={event.venueName}>
+            {event.venueName}
+          </span>
         </p>
         <p className="flex items-center gap-xs text-body text-ink-muted">
           <Icon name="calendar" className="h-4 w-4 shrink-0" />
-          {event.startsAtLabel} · {event.timeLabel}
+          <span className="min-w-0 truncate">
+            {event.startsAtLabel} · {event.timeLabel}
+          </span>
         </p>
 
         {event.priceLabel ? (

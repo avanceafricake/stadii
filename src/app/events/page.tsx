@@ -55,7 +55,7 @@ export default async function EventsPage() {
             <p className="mb-md text-body text-ink-muted">
               {items.length === 1 ? '1 event' : `${items.length} events`}
             </p>
-            <CardGrid>
+            <CardGrid columns={4}>
               {items.map((event) => (
                 <li key={String(event.id)} className="h-full">
                   <StadiiEventCard event={toEventCard(event, categoryFor)} />

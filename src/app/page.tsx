@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import {
+  CardGrid,
   SectionHeader,
   StadiiEventCard,
   StadiiMatchHero,
@@ -41,7 +42,11 @@ export default async function HomePage() {
   // discovery page leads with. If nothing upcoming has two sides, the hero is
   // simply omitted rather than filled with an event pretending to be one.
   const featured = events.data.find(isMatch);
-  const rest = events.data.filter((e) => e !== featured).slice(0, 4);
+  // The featured fixture appears in the row below as well, as it does in the
+  // approved design. It is not a duplicate by accident: the hero is a promotion
+  // and the row is the list, and a reader scanning the row for what is on
+  // should not find the biggest match of the week missing from it.
+  const rest = events.data.slice(0, 4);
 
   // No `aside` here. The homepage used to compose its own copy of the standing
   // panel, which is how the two drifted: it said "Browse football" while every
@@ -64,11 +69,13 @@ export default async function HomePage() {
             href={routes.venues()}
           />
         ) : (
-          <div className="grid gap-md sm:grid-cols-2 xl:grid-cols-3">
+          <CardGrid columns={4}>
             {rest.map((event) => (
-              <StadiiEventCard key={String(event.id)} event={toEventCard(event, categoryFor)} />
+              <li key={String(event.id)} className="h-full">
+                <StadiiEventCard event={toEventCard(event, categoryFor)} />
+              </li>
             ))}
-          </div>
+          </CardGrid>
         )}
       </section>
 
@@ -80,11 +87,13 @@ export default async function HomePage() {
             body="Venues appear here once an operator has set one up on STADII."
           />
         ) : (
-          <div className="grid gap-md sm:grid-cols-2 xl:grid-cols-4">
+          <CardGrid columns={4}>
             {venues.data.slice(0, 4).map((venue) => (
-              <StadiiStadiumCard key={String(venue.id)} stadium={toStadiumCard(venue)} />
+              <li key={String(venue.id)} className="h-full">
+                <StadiiStadiumCard stadium={toStadiumCard(venue)} />
+              </li>
             ))}
-          </div>
+          </CardGrid>
         )}
       </section>
 
