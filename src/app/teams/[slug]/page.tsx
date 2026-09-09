@@ -87,6 +87,7 @@ export default async function TeamPage({ params }: Params) {
       <PageIntro title={participant.displayName} lede={detail}
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Teams & athletes', path: routes.teams() },

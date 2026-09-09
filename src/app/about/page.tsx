@@ -18,10 +18,18 @@ export const metadata: Metadata = buildMetadata({
 export default function AboutPage() {
   return (
     <StadiiShell>
-      <Breadcrumbs crumbs={[{ name: 'About', path: routes.about() }]} />
       <PageIntro
         title="About STADII"
         lede="A ticketing and stadium-access platform built for East African sport, not adapted from somewhere else."
+        crumbs={
+          <Breadcrumbs
+            onDark
+            crumbs={[
+              { name: 'Home', path: routes.home() },
+              { name: 'About', path: routes.about() },
+            ]}
+          />
+        }
       />
 
       <Section>

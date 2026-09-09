@@ -78,10 +78,18 @@ export default function HelpPage() {
         }}
       />
 
-      <Breadcrumbs crumbs={[{ name: 'Help', path: routes.help() }]} />
       <PageIntro
         title="Help"
         lede="When something has gone wrong. If you are at the stadium and stuck, the help desk at the gate can see your ticket immediately."
+        crumbs={
+          <Breadcrumbs
+            onDark
+            crumbs={[
+              { name: 'Home', path: routes.home() },
+              { name: 'Help', path: routes.help() },
+            ]}
+          />
+        }
       />
 
       <Section>

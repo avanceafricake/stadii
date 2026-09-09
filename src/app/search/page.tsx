@@ -71,6 +71,7 @@ export default async function SearchPage({
         lede="Events, sports, teams and athletes, competitions and venues."
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Search', path: routes.search() },

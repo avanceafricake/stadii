@@ -553,36 +553,128 @@ export function StadiiUpcomingEvents({ items }: { items: readonly UpcomingItem[]
 // ---------------------------------------------------------------------------
 
 /**
- * The top of an inner page: trail, title, one line of explanation.
+ * The top of a page: the trail, the title and the one line of explanation, on
+ * a hero band rather than on the page background.
  *
- * Inner pages used a full-bleed `PageHeader` above the content while the
- * homepage put everything inside the shell. That is two page templates on one
- * site, and it showed the moment you clicked from Home to Events — the sidebar
- * appeared and disappeared. This lives inside the shell's content column, so
- * every page has the same frame around it.
+ * Every page gets the same band, which is the point — it is what makes a
+ * stadium page and a refund policy read as the same product. It replaces a
+ * plain header that sat on the page background; the design puts this content on
+ * an image, so this puts it on an image.
+ *
+ * `imageUrl` is that image and is deliberately optional, because for most of
+ * this site there is not one yet. The venue research pack records source pages
+ * rather than image rights and its Review Notes require licensing to be
+ * confirmed before public use, so the default background is DRAWN rather than
+ * borrowed — a deep-teal wash with a stadium bowl and floodlight throw in it.
+ * That is the one background here that cannot become a rights problem, and it
+ * reads as a decision rather than as a slot waiting for something better. Pass
+ * `imageUrl` the day there is a photograph and the artwork steps aside.
+ *
+ * The copy sits in the left two-thirds and the artwork weights right, so a
+ * photograph dropped in later has somewhere to be seen without the headline
+ * landing on top of it.
  */
 export function PageIntro({
   title,
   lede,
   crumbs,
   actions,
+  imageUrl,
 }: {
   title: string;
   lede?: string;
+  /** Pass `<Breadcrumbs onDark />` — the band is dark. */
   crumbs?: ReactNode;
   actions?: ReactNode;
+  imageUrl?: string;
 }) {
   return (
-    <header className="mb-lg">
-      {crumbs ? <div className="mb-sm">{crumbs}</div> : null}
-      <div className="flex flex-wrap items-end justify-between gap-md">
-        <div className="min-w-0">
-          <h1 className="text-headline font-bold tracking-tight text-ink">{title}</h1>
-          {lede ? <p className="mt-xs max-w-prose text-body-lg text-ink-muted">{lede}</p> : null}
+    <header className="relative mb-lg overflow-hidden rounded-lg bg-brand text-ink-inverse">
+      {imageUrl ? (
+        <>
+          <RemoteImage
+            src={imageUrl}
+            alt=""
+            fill
+            sizes="(max-width: 1024px) 100vw, 900px"
+            className="object-cover"
+          />
+          {/* A scrim, not a tint. The copy has to stay readable over whatever
+              the photograph turns out to be, including a bright sky. */}
+          <div className="absolute inset-0 bg-gradient-to-r from-brand via-brand/85 to-brand/45" />
+        </>
+      ) : (
+        <HeroArtwork />
+      )}
+
+      <div className="relative px-lg py-lg sm:px-xl sm:py-xl">
+        {crumbs ? <div className="mb-sm">{crumbs}</div> : null}
+        <div className="flex flex-wrap items-end justify-between gap-md">
+          <div className="min-w-0">
+            <h1 className="max-w-2xl text-headline font-bold leading-tight tracking-tight">
+              {title}
+            </h1>
+            {lede ? <p className="mt-sm max-w-prose text-body-lg text-white/75">{lede}</p> : null}
+          </div>
+          {actions ? <div className="shrink-0">{actions}</div> : null}
         </div>
-        {actions ? <div className="shrink-0">{actions}</div> : null}
       </div>
     </header>
+  );
+}
+
+/**
+ * The drawn background: a stadium bowl under floodlight throw.
+ *
+ * Inline SVG rather than a file. It is a dozen shapes, and a request on the
+ * critical path of a page whose job is to load quickly on a Kenyan mobile
+ * connection is the worse trade. Everything is white at low alpha, so it works
+ * on the brand teal and nothing else has to know about it.
+ */
+function HeroArtwork() {
+  return (
+    <div aria-hidden="true" className="absolute inset-0">
+      <div className="absolute inset-0 bg-gradient-to-br from-brand-800 via-brand to-brand-900" />
+      {/* `currentColor` rather than a literal: the band sets `text-ink-inverse`
+          and the artwork inherits it, so the drawing cannot drift from the
+          palette it sits on and the no-colour-literals rule stays satisfied. */}
+      <svg
+        viewBox="0 0 900 220"
+        preserveAspectRatio="xMidYMid slice"
+        className="absolute inset-0 h-full w-full text-ink-inverse"
+      >
+        {/* The bowl in plan: rings for the tiers, the pitch inside them. It is
+            weighted right, away from the copy. */}
+        <g fill="none" stroke="currentColor" strokeOpacity="0.10" strokeWidth="1.5">
+          <ellipse cx="740" cy="110" rx="235" ry="112" />
+          <ellipse cx="740" cy="110" rx="188" ry="88" />
+          <ellipse cx="740" cy="110" rx="141" ry="64" />
+        </g>
+        <ellipse cx="740" cy="110" rx="96" ry="41" fill="currentColor" fillOpacity="0.05" />
+        <line
+          x1="740"
+          y1="69"
+          x2="740"
+          y2="151"
+          stroke="currentColor"
+          strokeOpacity="0.10"
+          strokeWidth="1.5"
+        />
+
+        {/* Floodlight throw from the top left, which is where the copy is not. */}
+        <path d="M0 0 L285 0 L120 220 L0 220 Z" fill="currentColor" fillOpacity="0.035" />
+        <path d="M55 0 L200 0 L108 220 L18 220 Z" fill="currentColor" fillOpacity="0.02" />
+
+        {/* A ground line, so the shapes sit on something rather than float. */}
+        <path
+          d="M0 196 Q 450 168 900 200"
+          fill="none"
+          stroke="currentColor"
+          strokeOpacity="0.08"
+          strokeWidth="1.5"
+        />
+      </svg>
+    </div>
   );
 }
 

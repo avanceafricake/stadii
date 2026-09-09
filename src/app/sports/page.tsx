@@ -37,6 +37,7 @@ export default async function SportsPage() {
         lede="Everything organisers are running on STADII. Pick one to see what is coming up."
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Sports', path: routes.sports() },

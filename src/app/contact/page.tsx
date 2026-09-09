@@ -17,10 +17,18 @@ export const metadata: Metadata = buildMetadata({
 export default function ContactPage() {
   return (
     <StadiiShell>
-      <Breadcrumbs crumbs={[{ name: 'Contact', path: routes.contact() }]} />
       <PageIntro
         title="Contact us"
         lede="Have your order number or ticket number ready — it is the fastest way for us to find what you are asking about."
+        crumbs={
+          <Breadcrumbs
+            onDark
+            crumbs={[
+              { name: 'Home', path: routes.home() },
+              { name: 'Contact', path: routes.contact() },
+            ]}
+          />
+        }
       />
 
       <Section>

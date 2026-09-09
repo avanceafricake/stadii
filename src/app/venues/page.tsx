@@ -32,6 +32,7 @@ export default async function VenuesPage() {
         lede="Where sport happens in Kenya and East Africa. Each ground has its address, how it is laid out, and what is coming up there."
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Stadiums', path: routes.venues() },

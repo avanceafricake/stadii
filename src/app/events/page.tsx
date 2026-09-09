@@ -31,6 +31,7 @@ export default async function EventsPage() {
         lede="Published events, soonest first. Times are shown in the stadium's local time."
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Events', path: routes.events() },

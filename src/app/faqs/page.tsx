@@ -97,6 +97,7 @@ export default function FaqsPage() {
         lede="What people ask before their first STADII ticket. If something has already gone wrong — a code that will not load, a payment with no tickets — the help centre is the page you want."
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'FAQs', path: routes.faqs() },

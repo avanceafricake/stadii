@@ -69,6 +69,7 @@ export default async function CompetitionPage({ params }: Params) {
         lede={competition.format?.toLowerCase().replace(/_/g, ' ')}
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Competitions', path: routes.competitions() },

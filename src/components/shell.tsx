@@ -355,11 +355,19 @@ export function StadiiMobileNav({ active }: { active?: string }) {
  *
  *     224 sidebar
  *   +  24 gap
- *   + 824 main            <- what is left over at 1440
+ *   + 896 main            <- what is left over at 1440
  *   +  24 gap
- *   + 320 panel
+ *   + 248 panel
  *   +  24 right margin
  *   = 1440
+ *
+ * The panel is 248 rather than the 320 first specified, because 320 was taking
+ * its width out of the only column that flexes. Four event cards across the
+ * main column came out at 190px each at 1440 — the width where a venue name
+ * starts wrapping to three lines — against roughly 218 in the approved design.
+ * The design's own panel measures about 244. At 248 the cards are 212 and the
+ * panel still holds a date chip, two lines of event and a chevron without
+ * crowding, which is everything it is asked to hold.
  *
  * The sidebar is flush to the left edge and pads its own labels in by 24, so
  * the nav aligns with the logo above it while the column keeps its full 224.
@@ -399,7 +407,7 @@ export function StadiiShell({
         // From `lg` the sidebar is a rail against the window edge, so the left
         // gutter belongs to the sidebar rather than to the page.
         'lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:pl-0 lg:pr-lg',
-        showPanel && 'xl:grid-cols-[14rem_minmax(0,1fr)_20rem]',
+        showPanel && 'xl:grid-cols-[14rem_minmax(0,1fr)_15.5rem]',
       )}
     >
       <StadiiSidebar active={active} />

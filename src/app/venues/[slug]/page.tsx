@@ -108,6 +108,7 @@ export default async function VenuePage({ params }: Params) {
         lede={placeLine(venue.address?.city, venue.address?.county)}
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Stadiums', path: routes.venues() },

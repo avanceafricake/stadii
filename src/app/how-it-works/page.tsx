@@ -66,6 +66,7 @@ export default function HowItWorksPage() {
         lede="From finding an event to walking through a turnstile."
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'How it works', path: routes.howItWorks() },

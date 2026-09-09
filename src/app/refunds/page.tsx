@@ -33,6 +33,7 @@ export default function RefundsPage() {
         lede="When money goes back, who decides, and how long it takes."
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Refund policy', path: routes.refunds() },

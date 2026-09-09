@@ -27,10 +27,18 @@ export const metadata: Metadata = buildMetadata({
 export default function PrivacyPage() {
   return (
     <StadiiShell>
-      <Breadcrumbs crumbs={[{ name: 'Privacy', path: routes.privacy() }]} />
       <PageIntro
         title="Privacy"
         lede="What we hold about you, why we hold it, and what we deliberately do not."
+        crumbs={
+          <Breadcrumbs
+            onDark
+            crumbs={[
+              { name: 'Home', path: routes.home() },
+              { name: 'Privacy', path: routes.privacy() },
+            ]}
+          />
+        }
       />
 
       <Section>

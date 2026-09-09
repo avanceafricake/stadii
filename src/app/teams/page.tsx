@@ -36,6 +36,7 @@ export default async function TeamsPage() {
         lede="Teams, clubs, athletes and organisations that appear on STADII events."
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Teams & athletes', path: routes.teams() },

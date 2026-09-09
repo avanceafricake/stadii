@@ -26,10 +26,18 @@ export const metadata: Metadata = buildMetadata({
 export default function TermsPage() {
   return (
     <StadiiShell>
-      <Breadcrumbs crumbs={[{ name: 'Terms', path: routes.terms() }]} />
       <PageIntro
         title="Terms of use"
         lede="What you are agreeing to when you buy a ticket through STADII."
+        crumbs={
+          <Breadcrumbs
+            onDark
+            crumbs={[
+              { name: 'Home', path: routes.home() },
+              { name: 'Terms', path: routes.terms() },
+            ]}
+          />
+        }
       />
 
       <Section>

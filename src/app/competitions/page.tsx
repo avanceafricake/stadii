@@ -29,6 +29,7 @@ export default async function CompetitionsPage() {
         lede="Leagues, knockouts, meets and friendly series. An event may belong to one, or to none."
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Competitions', path: routes.competitions() },

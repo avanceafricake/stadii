@@ -69,6 +69,7 @@ export default async function SportPage({ params }: Params) {
       <PageIntro title={sport.name} lede={`Upcoming ${sport.name.toLowerCase()} on STADII.`}
         crumbs={
           <Breadcrumbs
+            onDark
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Sports', path: routes.sports() },
