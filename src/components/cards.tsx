@@ -593,7 +593,11 @@ export function CardGrid({
     <ul
       className={cx(
         'grid list-none gap-md p-0 sm:grid-cols-2',
-        columns === 3 && 'xl:grid-cols-3',
+        // Only `main` flexes, so on a wide monitor it is the card grid that
+        // inherits the extra room. A fourth column at 2xl keeps a card about
+        // the size it is in the approved design instead of letting three cards
+        // stretch to 420px each.
+        columns === 3 && 'xl:grid-cols-3 2xl:grid-cols-4',
         columns === 4 && 'lg:grid-cols-3 xl:grid-cols-4',
       )}
     >

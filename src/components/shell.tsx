@@ -120,7 +120,7 @@ export function Icon({ name, className }: { name: IconName; className?: string }
 export function StadiiHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-outline-subtle bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-shell items-center gap-md px-md sm:px-lg lg:px-xl">
+      <div className="flex h-[4.5rem] items-center gap-md px-md sm:px-lg">
         <Link href={routes.home()} className="flex shrink-0 items-center" aria-label={site.name}>
           <Image
             src="/brand/logo-landscape.png"
@@ -197,8 +197,8 @@ export function StadiiSearchBar({ className }: { className?: string }) {
 
 export function StadiiSidebar({ active }: { active?: string }) {
   return (
-    <div className="hidden lg:block">
-      <div className="sticky top-[5.5rem] space-y-lg">
+    <div className="hidden lg:block lg:pl-lg">
+      <div className="sticky top-[6rem] space-y-lg">
         <nav aria-label="Sections">
           <ul className="space-y-px p-0">
             {NAV.map((item) => {
@@ -306,7 +306,7 @@ export function StadiiMobileNav({ active }: { active?: string }) {
       aria-label="Sections"
       className="sticky bottom-0 z-30 border-t border-outline-subtle bg-surface lg:hidden"
     >
-      <ul className="mx-auto flex max-w-shell p-0">
+      <ul className="flex p-0">
         {items.map((item) => {
           const isActive = active === item.href;
           return (
@@ -348,30 +348,67 @@ export function StadiiMobileNav({ active }: { active?: string }) {
  * opened the page. The sidebar goes at `lg` and becomes a bottom bar, because a
  * thumb reaches the bottom of a screen and not the side of one.
  *
- * Widths: `max-w-shell` is 1344 — a 1280 content band plus 32px gutters — so
- * the page stops growing well before the edge of a 1920 monitor. Inside it,
- * 224 sidebar + 304 panel + two 24px gaps leaves a 704px main column, which is
- * about 85 characters of body text: long enough not to feel cramped, short
- * enough to still be a column. The arithmetic lives on `maxWidth.shell` in
- * tailwind.config.ts, where all four numbers are together.
+ * WIDTHS. This is an application frame, not a centred document, so it is not
+ * capped — a 1280 band with a sidebar and a right panel inside it leaves a main
+ * column too narrow to lay out an event grid in, which is the mistake this
+ * replaced. The measurements come off the 1440 design canvas outward:
+ *
+ *     224 sidebar
+ *   +  24 gap
+ *   + 824 main            <- what is left over at 1440
+ *   +  24 gap
+ *   + 320 panel
+ *   +  24 right margin
+ *   = 1440
+ *
+ * The sidebar is flush to the left edge and pads its own labels in by 24, so
+ * the nav aligns with the logo above it while the column keeps its full 224.
+ * Only `main` flexes: the sidebar and the panel are fixed, so a wider monitor
+ * gives its extra pixels to the content and not to the furniture. Paragraphs
+ * inside still stop at `max-w-prose`, because a 1300px line is unreadable
+ * however wide the window is.
  */
 export function StadiiShell({
   children,
   aside,
   active,
+  panel = true,
 }: {
   children: ReactNode;
-  /** Overrides the standing panel. Omit it to get the standing one. */
+  /** Overrides the standing panel's CONTENT. Omit it to get the standing one. */
   aside?: ReactNode;
   active?: string;
+  /**
+   * Whether this page has a right panel at all.
+   *
+   * True for every discovery page, and the default, because supporting
+   * material is what those pages want in that space. False for a page whose
+   * job is one task and where a panel would be something to look at instead of
+   * finishing — a checkout, a sign-in. No such page exists on this surface yet
+   * (it holds no session and has no checkout, ADR-0018); the switch is here so
+   * that when one arrives it is a parameter rather than a second shell.
+   */
+  panel?: boolean;
 }) {
+  const showPanel = panel;
+
   return (
-    <div className="mx-auto w-full max-w-shell gap-lg px-md py-lg sm:px-lg lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:px-xl xl:grid-cols-[14rem_minmax(0,1fr)_19rem]">
+    <div
+      className={cx(
+        'w-full gap-lg px-md py-lg sm:px-lg',
+        // From `lg` the sidebar is a rail against the window edge, so the left
+        // gutter belongs to the sidebar rather than to the page.
+        'lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:pl-0 lg:pr-lg',
+        showPanel && 'xl:grid-cols-[14rem_minmax(0,1fr)_20rem]',
+      )}
+    >
       <StadiiSidebar active={active} />
       <div className="min-w-0">{children}</div>
-      <aside className="mt-lg space-y-md xl:mt-0">
-        <div className="xl:sticky xl:top-[5.5rem] xl:space-y-md">{aside ?? <StadiiAside />}</div>
-      </aside>
+      {showPanel ? (
+        <aside className="mt-lg space-y-md xl:mt-0">
+          <div className="xl:sticky xl:top-[6rem] xl:space-y-md">{aside ?? <StadiiAside />}</div>
+        </aside>
+      ) : null}
     </div>
   );
 }
@@ -468,7 +505,7 @@ function SocialIcon({ name }: { name: string }) {
 export function StadiiFooter() {
   return (
     <footer className="bg-brand text-ink-inverse">
-      <div className="mx-auto max-w-shell px-md py-xl sm:px-lg lg:px-xl">
+      <div className="px-md py-xl sm:px-lg">
         <div className="grid gap-lg md:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)_1fr]">
           <div>
             {/* The landscape lockup, as the brand requires. It is artwork on a

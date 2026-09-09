@@ -54,7 +54,7 @@ export default async function HomePage() {
         <WelcomePanel />
       )}
 
-      <section className="mt-xl">
+      <section className="mt-section">
         <SectionHeader title="Featured events" href={routes.events()} />
         {rest.length === 0 ? (
           <EmptyPanel
@@ -72,7 +72,7 @@ export default async function HomePage() {
         )}
       </section>
 
-      <section className="mt-xl">
+      <section className="mt-section">
         <SectionHeader title="Top stadiums" href={routes.venues()} />
         {venues.data.length === 0 ? (
           <EmptyPanel
@@ -89,7 +89,7 @@ export default async function HomePage() {
       </section>
 
       {sports.data.length > 0 ? (
-        <section className="mt-xl">
+        <section className="mt-section">
           <SectionHeader title="By sport" href={routes.sports()} />
           <ul className="flex flex-wrap gap-xs p-0">
             {sports.data.map((sport) => (
