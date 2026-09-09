@@ -2,7 +2,9 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Container, PageHeader, Prose, Section } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Prose, Section } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { routes } from '@/lib/routes';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { site } from '@/lib/site';
@@ -24,9 +26,9 @@ export const metadata: Metadata = buildMetadata({
  */
 export default function PrivacyPage() {
   return (
-    <Container>
+    <StadiiShell>
       <Breadcrumbs crumbs={[{ name: 'Privacy', path: routes.privacy() }]} />
-      <PageHeader
+      <PageIntro
         title="Privacy"
         lede="What we hold about you, why we hold it, and what we deliberately do not."
       />
@@ -110,6 +112,6 @@ export default function PrivacyPage() {
           </p>
         </Prose>
       </Section>
-    </Container>
+    </StadiiShell>
   );
 }

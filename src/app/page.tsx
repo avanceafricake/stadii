@@ -5,19 +5,16 @@ import {
   SectionHeader,
   StadiiEventCard,
   StadiiMatchHero,
-  StadiiPromoCard,
-  StadiiQuickActions,
   StadiiStadiumCard,
-  StadiiUpcomingEvents,
 } from '@/components/cards';
 import { StadiiShell } from '@/components/shell';
 import { listSports, listUpcomingEvents, listVenues } from '@/lib/firestore/queries';
 import {
+  categoryResolver,
   isMatch,
   toEventCard,
   toFeaturedMatch,
   toStadiumCard,
-  toUpcomingItem,
 } from '@/lib/present/home';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
@@ -38,9 +35,7 @@ export default async function HomePage() {
     listVenues(),
   ]);
 
-  const sportNameById = new Map(sports.data.map((s) => [String(s.id), s.name]));
-  const categoryFor = (event: { sportId: unknown }) =>
-    sportNameById.get(String(event.sportId)) ?? 'Event';
+  const categoryFor = categoryResolver(sports.data);
 
   // The headline is the soonest FIXTURE, because a confrontation is what a
   // discovery page leads with. If nothing upcoming has two sides, the hero is
@@ -48,27 +43,11 @@ export default async function HomePage() {
   const featured = events.data.find(isMatch);
   const rest = events.data.filter((e) => e !== featured).slice(0, 4);
 
-  const aside = (
-    <>
-      <StadiiQuickActions />
-      <StadiiPromoCard
-        title={
-          <>
-            Football
-            <br />
-            is back
-          </>
-        }
-        body="Follow a club and hear about its fixtures the moment they go on sale."
-        ctaLabel="Browse football"
-        href={routes.sports()}
-      />
-      <StadiiUpcomingEvents items={events.data.slice(0, 5).map(toUpcomingItem)} />
-    </>
-  );
-
+  // No `aside` here. The homepage used to compose its own copy of the standing
+  // panel, which is how the two drifted: it said "Browse football" while every
+  // other page said "View football events". The shell supplies one panel now.
   return (
-    <StadiiShell aside={aside} active={routes.home()}>
+    <StadiiShell active={routes.home()}>
       {featured ? (
         <StadiiMatchHero match={toFeaturedMatch(featured, categoryFor)} />
       ) : (

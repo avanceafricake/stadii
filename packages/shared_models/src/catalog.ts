@@ -5,6 +5,7 @@ import type {
   CompetitionFormat,
   ParticipantKind,
   ParticipantModel,
+  ParticipantRole,
 } from '@stadii/shared-constants';
 import type {
   CompetitionId,
@@ -94,4 +95,17 @@ export interface ParticipantSummary {
   readonly displayName: string;
   readonly shortName?: string;
   readonly crestUrl?: string;
+  /**
+   * Which side this is, where anyone recorded it.
+   *
+   * Optional, and genuinely absent most of the time: an event has N
+   * participants and no home side (ADR-0004), so a meet has no roles at all and
+   * a fixture only has them if the organiser said so. Clients use it to decide
+   * which crest goes on the left and fall back to stored order when it is
+   * missing — they must never invent one.
+   *
+   * The Dart contract has always decoded this field. The model never declared
+   * it, so nothing could write it, so it was always undefined on the way back.
+   */
+  readonly role?: ParticipantRole;
 }

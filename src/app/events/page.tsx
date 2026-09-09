@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { EventCardGrid } from '@/components/event-card';
+import { CardGrid, PageIntro, StadiiEventCard } from '@/components/cards';
 import { LoadedList } from '@/components/loaded';
-import { ButtonLink, Container, PageHeader, Section } from '@/components/primitives';
-import { listUpcomingEvents } from '@/lib/firestore/queries';
+import { ButtonLink } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
+import { listSports, listUpcomingEvents } from '@/lib/firestore/queries';
+import { categoryResolver, toEventCard } from '@/lib/present/home';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
 
@@ -18,48 +20,51 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function EventsPage() {
-  const events = await listUpcomingEvents();
+  const [events, sports] = await Promise.all([listUpcomingEvents(), listSports()]);
+
+  const categoryFor = categoryResolver(sports.data);
 
   return (
-    <>
-      <PageHeader
+    <StadiiShell active={routes.events()}>
+      <PageIntro
         title="Upcoming events"
         lede="Published events, soonest first. Times are shown in the stadium's local time."
-      >
-        <div className="mt-md">
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Events', path: routes.events() },
             ]}
           />
-        </div>
-      </PageHeader>
+        }
+      />
 
-      <Container>
-        <Section>
-          <LoadedList
-            result={events}
-            what="upcoming events"
-            emptyTitle="Nothing is on sale right now"
-            emptyBody="No events have been published for the period ahead. Organisers publish fixtures as they are confirmed."
-            emptyAction={
-              <ButtonLink href={routes.sports()} tone="secondary">
-                Browse by sport
-              </ButtonLink>
-            }
-          >
-            {(items) => (
-              <>
-                <p className="mb-md text-body text-ink-muted">
-                  {items.length === 1 ? '1 event' : `${items.length} events`}
-                </p>
-                <EventCardGrid events={items} />
-              </>
-            )}
-          </LoadedList>
-        </Section>
-      </Container>
-    </>
+      <LoadedList
+        result={events}
+        what="upcoming events"
+        emptyTitle="Nothing is on sale right now"
+        emptyBody="No events have been published for the period ahead. Organisers publish fixtures as they are confirmed."
+        emptyAction={
+          <ButtonLink href={routes.sports()} tone="secondary">
+            Browse by sport
+          </ButtonLink>
+        }
+      >
+        {(items) => (
+          <>
+            <p className="mb-md text-body text-ink-muted">
+              {items.length === 1 ? '1 event' : `${items.length} events`}
+            </p>
+            <CardGrid>
+              {items.map((event) => (
+                <li key={String(event.id)} className="h-full">
+                  <StadiiEventCard event={toEventCard(event, categoryFor)} />
+                </li>
+              ))}
+            </CardGrid>
+          </>
+        )}
+      </LoadedList>
+    </StadiiShell>
   );
 }

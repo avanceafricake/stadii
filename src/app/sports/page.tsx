@@ -3,7 +3,9 @@ import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { LoadedList } from '@/components/loaded';
-import { Card, Container, PageHeader, Section } from '@/components/primitives';
+import { CardGrid, PageIntro } from '@/components/cards';
+import { Card } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { listSports } from '@/lib/firestore/queries';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
@@ -29,23 +31,20 @@ export default async function SportsPage() {
   const sports = await listSports();
 
   return (
-    <>
-      <PageHeader
+    <StadiiShell active={routes.sports()}>
+      <PageIntro
         title="Sports"
         lede="Everything organisers are running on STADII. Pick one to see what is coming up."
-      >
-        <div className="mt-md">
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Sports', path: routes.sports() },
             ]}
           />
-        </div>
-      </PageHeader>
+        }
+      />
 
-      <Container>
-        <Section>
           <LoadedList
             result={sports}
             what="the list of sports"
@@ -53,7 +52,7 @@ export default async function SportsPage() {
             emptyBody="Sports appear here as soon as an organiser publishes an event in one."
           >
             {(items) => (
-              <ul className="grid list-none gap-md p-0 sm:grid-cols-2 lg:grid-cols-3">
+              <CardGrid>
                 {items.map((sport) => (
                   <Card as="li" key={sport.id}>
                     <h2 className="text-body-lg font-semibold">
@@ -66,11 +65,9 @@ export default async function SportsPage() {
                     </p>
                   </Card>
                 ))}
-              </ul>
+              </CardGrid>
             )}
           </LoadedList>
-        </Section>
-      </Container>
-    </>
+    </StadiiShell>
   );
 }

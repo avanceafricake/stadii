@@ -143,6 +143,27 @@ export interface Venue extends Timestamped, Versioned, Attributed {
   readonly timezone: string;
   readonly totalCapacity?: number;
   /**
+   * Editorial prose about the ground: what it is, what it hosts, what a visitor
+   * should know. Written by an operator, not derived.
+   *
+   * The web and mobile clients have always decoded this field — the Dart
+   * `Venue` contract reads `description` and `imageUrl` — but the model never
+   * declared them, so nothing on the backend could write them and every venue
+   * page showed a name, a city and nothing else. Optional because a ground can
+   * be listed before anyone has written about it, and the UI must read well
+   * either way.
+   */
+  readonly description?: string;
+  /**
+   * A photograph of the ground.
+   *
+   * A URL, never an uploaded blob: image hosting is not this model's problem.
+   * Optional and expected to be absent for most of the catalogue — the venue
+   * research pack records source pages rather than image rights, so a
+   * photograph appears only once someone has confirmed the licence for it.
+   */
+  readonly imageUrl?: string;
+  /**
    * Incremented on any structural change. A published event pins the version it
    * was built from, so a later venue edit never retroactively alters seat labels
    * on tickets already in customers' phones.

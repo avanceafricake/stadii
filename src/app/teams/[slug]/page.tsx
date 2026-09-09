@@ -4,7 +4,9 @@ import type { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { EventCardGrid } from '@/components/event-card';
 import { LoadedList } from '@/components/loaded';
-import { Container, PageHeader, Section, SectionHeading } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Section, SectionHeading } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { UnavailableState } from '@/components/states';
 import { kindLabel } from '@/lib/format/participants';
 import { getParticipantBySlug, listUpcomingEvents } from '@/lib/firestore/queries';
@@ -62,11 +64,9 @@ export default async function TeamPage({ params }: Params) {
   if (!participant) {
     if (result.unavailable) {
       return (
-        <Container>
           <Section>
             <UnavailableState what="this team or athlete" />
           </Section>
-        </Container>
       );
     }
     notFound();
@@ -83,9 +83,9 @@ export default async function TeamPage({ params }: Params) {
     .join(' · ');
 
   return (
-    <>
-      <PageHeader title={participant.displayName} lede={detail}>
-        <div className="mt-md">
+    <StadiiShell active={routes.teams()}>
+      <PageIntro title={participant.displayName} lede={detail}
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
@@ -93,10 +93,8 @@ export default async function TeamPage({ params }: Params) {
               { name: participant.displayName, path: routes.team(participant.slug) },
             ]}
           />
-        </div>
-      </PageHeader>
-
-      <Container>
+        }
+      />
         <Section labelledBy="team-events">
           <SectionHeading id="team-events">Coming up</SectionHeading>
           <LoadedList
@@ -108,7 +106,6 @@ export default async function TeamPage({ params }: Params) {
             {(items) => <EventCardGrid events={items} />}
           </LoadedList>
         </Section>
-      </Container>
-    </>
+    </StadiiShell>
   );
 }

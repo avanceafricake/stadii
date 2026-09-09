@@ -2,7 +2,9 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Container, PageHeader, Prose, Section } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Prose, Section } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { routes } from '@/lib/routes';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { site } from '@/lib/site';
@@ -23,9 +25,9 @@ export const metadata: Metadata = buildMetadata({
  */
 export default function TermsPage() {
   return (
-    <Container>
+    <StadiiShell>
       <Breadcrumbs crumbs={[{ name: 'Terms', path: routes.terms() }]} />
-      <PageHeader
+      <PageIntro
         title="Terms of use"
         lede="What you are agreeing to when you buy a ticket through STADII."
       />
@@ -96,6 +98,6 @@ export default function TermsPage() {
           </p>
         </Prose>
       </Section>
-    </Container>
+    </StadiiShell>
   );
 }

@@ -1,9 +1,9 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { CardGrid, PageIntro, StadiiTeamCard } from '@/components/cards';
 import { LoadedList } from '@/components/loaded';
-import { Card, Container, PageHeader, Section } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { kindLabel } from '@/lib/format/participants';
 import { listParticipants } from '@/lib/firestore/queries';
 import { buildMetadata } from '@/lib/seo/metadata';
@@ -30,53 +30,44 @@ export default async function TeamsPage() {
   const participants = await listParticipants({ limit: 200 });
 
   return (
-    <>
-      <PageHeader
+    <StadiiShell active={routes.teams()}>
+      <PageIntro
         title="Teams and athletes"
         lede="Teams, clubs, athletes and organisations that appear on STADII events."
-      >
-        <div className="mt-md">
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Teams & athletes', path: routes.teams() },
             ]}
           />
-        </div>
-      </PageHeader>
+        }
+      />
 
-      <Container>
-        <Section>
-          <LoadedList
-            result={participants}
-            what="teams and athletes"
-            emptyTitle="Nobody is listed yet"
-            emptyBody="Teams, clubs and athletes appear here as organisers add them to the catalogue."
-          >
-            {(items) => (
-              <ul className="grid list-none gap-md p-0 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((participant) => (
-                  <Card as="li" key={participant.id}>
-                    <h2 className="text-body-lg font-semibold">
-                      <Link
-                        href={routes.team(participant.slug)}
-                        className="hover:text-brand-700"
-                      >
-                        {participant.displayName}
-                      </Link>
-                    </h2>
-                    <p className="mt-xs text-caption uppercase tracking-wide text-ink-subtle">
-                      {[kindLabel(participant.kind), participant.countryCode]
-                        .filter(Boolean)
-                        .join(' · ')}
-                    </p>
-                  </Card>
-                ))}
-              </ul>
-            )}
-          </LoadedList>
-        </Section>
-      </Container>
-    </>
+      <LoadedList
+        result={participants}
+        what="teams and athletes"
+        emptyTitle="Nobody is listed yet"
+        emptyBody="Teams, clubs and athletes appear here as organisers add them to the catalogue."
+      >
+        {(items) => (
+          <CardGrid>
+            {items.map((participant) => (
+              <li key={String(participant.id)} className="h-full">
+                <StadiiTeamCard
+                  team={{
+                    slug: String(participant.slug),
+                    name: participant.displayName,
+                    kindLabel: kindLabel(participant.kind),
+                    crestUrl: participant.crestUrl,
+                    countryCode: participant.countryCode,
+                  }}
+                />
+              </li>
+            ))}
+          </CardGrid>
+        )}
+      </LoadedList>
+    </StadiiShell>
   );
 }

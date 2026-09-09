@@ -70,6 +70,15 @@ export interface Event extends Timestamped, Versioned, Attributed {
   readonly subtitle?: string;
   readonly slug: string;
   readonly description?: string;
+  /**
+   * The event's own artwork.
+   *
+   * Used for anything that is not a two-sided fixture — a meet, a championship,
+   * a festival — because those have no crests to lead with. A fixture ignores
+   * it and shows its participants instead (ADR-0004). Both clients already
+   * decode this field; the model simply never declared it.
+   */
+  readonly heroImageUrl?: string;
   /** Free-form organizer metadata. Never read by domain logic. */
   readonly metadata?: Readonly<Record<string, string>>;
 

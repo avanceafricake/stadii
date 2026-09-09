@@ -3,7 +3,9 @@ import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { JsonLdScript } from '@/components/json-ld';
-import { Container, PageHeader, Prose, Section } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Prose, Section } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { routes } from '@/lib/routes';
 import { buildMetadata } from '@/lib/seo/metadata';
 
@@ -62,7 +64,7 @@ const FAQ = [
 
 export default function HelpPage() {
   return (
-    <Container>
+    <StadiiShell>
       <JsonLdScript
         id="ld-help-faq"
         data={{
@@ -77,9 +79,9 @@ export default function HelpPage() {
       />
 
       <Breadcrumbs crumbs={[{ name: 'Help', path: routes.help() }]} />
-      <PageHeader
+      <PageIntro
         title="Help"
-        lede="If you are at the stadium and stuck, the help desk at the gate can see your ticket immediately. These are the questions we get most often."
+        lede="When something has gone wrong. If you are at the stadium and stuck, the help desk at the gate can see your ticket immediately."
       />
 
       <Section>
@@ -96,11 +98,13 @@ export default function HelpPage() {
       <Section>
         <Prose>
           <p>
-            Still stuck? <Link href={routes.contact()}>Contact us</Link>, or read{' '}
-            <Link href={routes.howItWorks()}>how STADII works</Link>.
+            Not what you were looking for? The <Link href={routes.faqs()}>FAQs</Link>{' '}
+            answer the questions people ask before buying, and{' '}
+            <Link href={routes.howItWorks()}>how STADII works</Link> explains the whole
+            thing once. Still stuck — <Link href={routes.contact()}>contact us</Link>.
           </p>
         </Prose>
       </Section>
-    </Container>
+    </StadiiShell>
   );
 }

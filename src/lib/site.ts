@@ -17,6 +17,11 @@ function env(name: string, fallback = ''): string {
     NEXT_PUBLIC_APP_IOS_URL: process.env.NEXT_PUBLIC_APP_IOS_URL,
     NEXT_PUBLIC_SUPPORT_EMAIL: process.env.NEXT_PUBLIC_SUPPORT_EMAIL,
     NEXT_PUBLIC_SUPPORT_PHONE: process.env.NEXT_PUBLIC_SUPPORT_PHONE,
+    NEXT_PUBLIC_SOCIAL_X: process.env.NEXT_PUBLIC_SOCIAL_X,
+    NEXT_PUBLIC_SOCIAL_FACEBOOK: process.env.NEXT_PUBLIC_SOCIAL_FACEBOOK,
+    NEXT_PUBLIC_SOCIAL_INSTAGRAM: process.env.NEXT_PUBLIC_SOCIAL_INSTAGRAM,
+    NEXT_PUBLIC_SOCIAL_YOUTUBE: process.env.NEXT_PUBLIC_SOCIAL_YOUTUBE,
+    NEXT_PUBLIC_SOCIAL_TIKTOK: process.env.NEXT_PUBLIC_SOCIAL_TIKTOK,
   };
   const value = table[name];
   return value && value.length > 0 ? value : fallback;
@@ -43,6 +48,22 @@ export const site = {
     email: env('NEXT_PUBLIC_SUPPORT_EMAIL', 'support@stadii.co.ke'),
     phone: env('NEXT_PUBLIC_SUPPORT_PHONE', ''),
   },
+  /**
+   * Official accounts, if any exist yet.
+   *
+   * Deliberately empty by default and rendered only when set. A footer that
+   * links to a handle nobody has registered sends visitors to someone else's
+   * account, and a squatted handle on a ticketing brand is a fraud vector, not
+   * a cosmetic problem. Set these in the App Hosting environment once the
+   * accounts are real (docs/operations/configuration.md).
+   */
+  social: [
+    { label: 'X', url: env('NEXT_PUBLIC_SOCIAL_X', '') },
+    { label: 'Facebook', url: env('NEXT_PUBLIC_SOCIAL_FACEBOOK', '') },
+    { label: 'Instagram', url: env('NEXT_PUBLIC_SOCIAL_INSTAGRAM', '') },
+    { label: 'YouTube', url: env('NEXT_PUBLIC_SOCIAL_YOUTUBE', '') },
+    { label: 'TikTok', url: env('NEXT_PUBLIC_SOCIAL_TIKTOK', '') },
+  ].filter((account) => account.url.length > 0),
   app: {
     scheme: env('NEXT_PUBLIC_APP_SCHEME', 'stadii'),
     android: env('NEXT_PUBLIC_APP_ANDROID_URL', ''),

@@ -1,76 +1,35 @@
-import Link from 'next/link';
+/**
+ * The event grid used by every page that lists events for one thing — a
+ * competition, a sport, a team, a stadium, a search.
+ *
+ * There used to be a second event card here with its own markup, its own
+ * layout and its own idea of what an event looks like. Two card designs on one
+ * site is how a design system stops being one: the homepage showed a fixture as
+ * crest–VS–crest and the stadium page showed the same fixture as a paragraph.
+ * This is now an adapter onto `StadiiEventCard` — one card, everywhere.
+ *
+ * It resolves the sport name itself rather than making five call sites do it.
+ * `listSports` is wrapped in React `cache()`, so several grids on one page cost
+ * one read.
+ */
+
 import type { Event } from '@stadii/shared-models';
 
-import { EventStatusAxes } from './event-status';
-import { ParticipantLine } from './participants';
-import { Card } from './primitives';
-import { formatDayAndMonth, formatEventTime, timezoneLabel } from '@/lib/format/datetime';
-import { routes } from '@/lib/routes';
+import { CardGrid, StadiiEventCard } from './cards';
+import { listSports } from '@/lib/firestore/queries';
+import { categoryResolver, toEventCard } from '@/lib/present/home';
 
-/**
- * One event in a list.
- *
- * The card shows the event's own stored `title` as the headline. An event title
- * is always stored and never derived from participants (see the Event model) —
- * that is what lets "Kenya National Swimming Championships" be a first-class
- * title instead of a special case in a formatter.
- */
-export function EventCard({ event }: { event: Event }) {
-  const summaries = event.participantSummaries ?? [];
+export async function EventCardGrid({ events }: { events: readonly Event[] }) {
+  const sports = await listSports();
+  const categoryFor = categoryResolver(sports.data);
 
   return (
-    <Card as="article" className="flex h-full flex-col gap-sm transition-shadow hover:shadow-md">
-      <div className="flex items-baseline justify-between gap-sm">
-        <p className="text-caption font-semibold uppercase tracking-wide text-brand-700">
-          <time dateTime={new Date(event.startsAt).toISOString()}>
-            {formatDayAndMonth(event.startsAt, event.timezone)}
-          </time>
-          <span className="mx-xs text-outline-strong" aria-hidden="true">
-            •
-          </span>
-          {formatEventTime(event.startsAt, event.timezone)} {timezoneLabel(event.timezone)}
-        </p>
-      </div>
-
-      <h3 className="text-body-lg font-semibold leading-snug text-ink">
-        <Link href={routes.event(event.slug)} className="hover:text-brand-700">
-          {/* The whole card is reachable through this link; a nested clickable
-              area would create two tab stops for one destination. */}
-          <span className="absolute inset-0" aria-hidden="true" />
-          {event.title}
-        </Link>
-      </h3>
-
-      {event.subtitle ? (
-        <p className="text-body text-ink-muted">{event.subtitle}</p>
-      ) : null}
-
-      <ParticipantLine
-        participants={summaries.map((summary) => ({
-          id: summary.participantId,
-          name: summary.displayName,
-          shortName: summary.shortName,
-        }))}
-      />
-
-      <p className="mt-auto text-body text-ink-muted">
-        {event.venueSummary?.name}
-        {event.venueSummary?.city ? `, ${event.venueSummary.city}` : ''}
-      </p>
-
-      <EventStatusAxes event={event} />
-    </Card>
-  );
-}
-
-export function EventCardGrid({ events }: { events: readonly Event[] }) {
-  return (
-    <ul className="grid list-none gap-md p-0 sm:grid-cols-2 lg:grid-cols-3">
+    <CardGrid>
       {events.map((event) => (
-        <li key={event.id} className="relative">
-          <EventCard event={event} />
+        <li key={String(event.id)} className="h-full">
+          <StadiiEventCard event={toEventCard(event, categoryFor)} />
         </li>
       ))}
-    </ul>
+    </CardGrid>
   );
 }

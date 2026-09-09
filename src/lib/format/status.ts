@@ -262,3 +262,30 @@ export function purchaseEntryPoint(event: {
       };
   }
 }
+
+/**
+ * Only the axes worth interrupting a card for.
+ *
+ * A list card is not a status page. Three badges on every card is noise, and
+ * noise is what a reader learns to skip — including on the one card where it
+ * mattered. So this returns nothing at all for the ordinary case (scheduled,
+ * on sale, published) and returns the axes that are NOT ordinary when they are
+ * not.
+ *
+ * It still never merges them: a postponed event that is still selling comes
+ * back as two badges, because "the match moved" and "you can still buy" are
+ * different facts and a customer needs both (ADR-0016).
+ */
+export function noteworthyAxes(event: {
+  publicationStatus: EventPublicationStatus;
+  operationalStatus: EventOperationalStatus;
+  salesStatus: EventSalesStatus;
+  salesStatusReason?: string;
+}): readonly AxisPresentation[] {
+  const ordinary = new Set<string>([
+    EVENT_OPERATIONAL_STATUS.SCHEDULED,
+    EVENT_SALES_STATUS.ON_SALE,
+    EVENT_PUBLICATION_STATUS.PUBLISHED,
+  ]);
+  return allAxes(event).filter((axis) => !ordinary.has(axis.value));
+}

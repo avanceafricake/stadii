@@ -5,7 +5,9 @@ import type { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { EventCardGrid } from '@/components/event-card';
 import { LoadedList } from '@/components/loaded';
-import { Container, PageHeader, Section, SectionHeading } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Section, SectionHeading } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { UnavailableState } from '@/components/states';
 import {
   getCompetitionBySlug,
@@ -47,11 +49,9 @@ export default async function CompetitionPage({ params }: Params) {
   if (!competition) {
     if (result.unavailable) {
       return (
-        <Container>
           <Section>
             <UnavailableState what="this competition" />
           </Section>
-        </Container>
       );
     }
     notFound();
@@ -63,12 +63,11 @@ export default async function CompetitionPage({ params }: Params) {
   ]);
 
   return (
-    <>
-      <PageHeader
+    <StadiiShell active={routes.competitions()}>
+      <PageIntro
         title={competition.name}
         lede={competition.format?.toLowerCase().replace(/_/g, ' ')}
-      >
-        <div className="mt-md">
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
@@ -76,21 +75,20 @@ export default async function CompetitionPage({ params }: Params) {
               { name: competition.name, path: routes.competition(competition.slug) },
             ]}
           />
-        </div>
-        {sport.data ? (
-          <p className="mt-sm text-body text-ink-muted">
-            Part of{' '}
-            <Link
-              href={routes.sport(sport.data.slug)}
-              className="font-medium text-brand-700 underline"
-            >
-              {sport.data.name}
-            </Link>
-          </p>
-        ) : null}
-      </PageHeader>
+        }
+      />
 
-      <Container>
+      {sport.data ? (
+        <p className="mb-lg text-body text-ink-muted">
+          Part of{' '}
+          <Link
+            href={routes.sport(sport.data.slug)}
+            className="font-medium text-info-700 underline"
+          >
+            {sport.data.name}
+          </Link>
+        </p>
+      ) : null}
         <Section labelledBy="competition-events">
           <SectionHeading id="competition-events">Fixtures</SectionHeading>
           <LoadedList
@@ -102,7 +100,6 @@ export default async function CompetitionPage({ params }: Params) {
             {(items) => <EventCardGrid events={items} />}
           </LoadedList>
         </Section>
-      </Container>
-    </>
+    </StadiiShell>
   );
 }

@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Container, PageHeader, Prose, Section } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Prose, Section } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { routes } from '@/lib/routes';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { site } from '@/lib/site';
@@ -15,9 +17,9 @@ export const metadata: Metadata = buildMetadata({
 
 export default function AboutPage() {
   return (
-    <Container>
+    <StadiiShell>
       <Breadcrumbs crumbs={[{ name: 'About', path: routes.about() }]} />
-      <PageHeader
+      <PageIntro
         title="About STADII"
         lede="A ticketing and stadium-access platform built for East African sport, not adapted from somewhere else."
       />
@@ -62,6 +64,6 @@ export default function AboutPage() {
           </p>
         </Prose>
       </Section>
-    </Container>
+    </StadiiShell>
   );
 }

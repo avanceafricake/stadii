@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Container, PageHeader, Prose, Section } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Prose, Section } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { routes } from '@/lib/routes';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { site } from '@/lib/site';
@@ -14,9 +16,9 @@ export const metadata: Metadata = buildMetadata({
 
 export default function ContactPage() {
   return (
-    <Container>
+    <StadiiShell>
       <Breadcrumbs crumbs={[{ name: 'Contact', path: routes.contact() }]} />
-      <PageHeader
+      <PageIntro
         title="Contact us"
         lede="Have your order number or ticket number ready — it is the fastest way for us to find what you are asking about."
       />
@@ -54,6 +56,6 @@ export default function ContactPage() {
           </p>
         </Prose>
       </Section>
-    </Container>
+    </StadiiShell>
   );
 }

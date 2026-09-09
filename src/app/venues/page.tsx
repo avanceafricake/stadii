@@ -1,20 +1,24 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import { CardGrid, PageIntro, StadiiStadiumCard } from '@/components/cards';
 import { LoadedList } from '@/components/loaded';
-import { Card, Container, PageHeader, Section } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { listVenues } from '@/lib/firestore/queries';
+import { toStadiumCard } from '@/lib/present/home';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
-import { placeLine } from '@/lib/format/format';
 
 export const revalidate = 3600;
 
 export const metadata: Metadata = buildMetadata({
-  title: 'Venues',
+  // "Stadiums" everywhere a visitor can see, because that is the word on the
+  // navigation and the word people use. The route stays /venues: the model is
+  // a venue — a pool and a track are not stadiums — and changing a live URL to
+  // match a label would break every link already shared.
+  title: 'Stadiums',
   description:
-    'Stadiums, tracks and pools hosting events on STADII, with addresses and directions.',
+    'Stadiums, tracks and pools hosting events on STADII, with addresses, capacity and directions.',
   path: routes.venues(),
 });
 
@@ -22,54 +26,41 @@ export default async function VenuesPage() {
   const venues = await listVenues();
 
   return (
-    <>
-      <PageHeader
-        title="Venues"
-        lede="Where events happen. Each venue page has the address, directions and how the ground is laid out."
-      >
-        <div className="mt-md">
+    <StadiiShell active={routes.venues()}>
+      <PageIntro
+        title="Stadiums"
+        lede="Where sport happens in Kenya and East Africa. Each ground has its address, how it is laid out, and what is coming up there."
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
-              { name: 'Venues', path: routes.venues() },
+              { name: 'Stadiums', path: routes.venues() },
             ]}
           />
-        </div>
-      </PageHeader>
+        }
+      />
 
-      <Container>
-        <Section>
-          <LoadedList
-            result={venues}
-            what="the list of venues"
-            emptyTitle="No venues listed yet"
-            emptyBody="Venues appear here once an operator has set one up on STADII."
-          >
-            {(items) => (
-              <ul className="grid list-none gap-md p-0 sm:grid-cols-2 lg:grid-cols-3">
-                {items.map((venue) => (
-                  <Card as="li" key={venue.id}>
-                    <h2 className="text-body-lg font-semibold">
-                      <Link href={routes.venue(venue.slug)} className="hover:text-brand-700">
-                        {venue.name}
-                      </Link>
-                    </h2>
-                    <p className="mt-xs text-body text-ink-muted">
-                      {placeLine(venue.address?.city, venue.address?.county)}
-
-                    </p>
-                    {typeof venue.totalCapacity === 'number' ? (
-                      <p className="mt-xs text-caption text-ink-subtle">
-                        Capacity {venue.totalCapacity.toLocaleString('en-KE')}
-                      </p>
-                    ) : null}
-                  </Card>
-                ))}
-              </ul>
-            )}
-          </LoadedList>
-        </Section>
-      </Container>
-    </>
+      <LoadedList
+        result={venues}
+        what="the list of stadiums"
+        emptyTitle="No stadiums listed yet"
+        emptyBody="Grounds appear here once an operator has set one up on STADII."
+      >
+        {(items) => (
+          <>
+            <p className="mb-md text-body text-ink-muted">
+              {items.length === 1 ? '1 stadium' : `${items.length} stadiums`}
+            </p>
+            <CardGrid columns={4}>
+              {items.map((venue) => (
+                <li key={String(venue.id)} className="h-full">
+                  <StadiiStadiumCard stadium={toStadiumCard(venue)} />
+                </li>
+              ))}
+            </CardGrid>
+          </>
+        )}
+      </LoadedList>
+    </StadiiShell>
   );
 }

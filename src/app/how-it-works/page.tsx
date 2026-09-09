@@ -3,7 +3,9 @@ import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { JsonLdScript } from '@/components/json-ld';
-import { Container, PageHeader, Prose, Section } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Prose, Section } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
 
@@ -16,7 +18,7 @@ export const metadata: Metadata = buildMetadata({
 
 export default function HowItWorksPage() {
   return (
-    <>
+    <StadiiShell>
       <JsonLdScript
         id="ld-howto"
         data={{
@@ -59,22 +61,20 @@ export default function HowItWorksPage() {
         }}
       />
 
-      <PageHeader
+      <PageIntro
         title="How STADII works"
         lede="From finding an event to walking through a turnstile."
-      >
-        <div className="mt-md">
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'How it works', path: routes.howItWorks() },
             ]}
           />
-        </div>
-      </PageHeader>
+        }
+      />
 
-      <Container>
-        <Section>
+      <Section>
           <Prose>
             <h2>1. Find the event</h2>
             <p>
@@ -168,7 +168,6 @@ export default function HowItWorksPage() {
             </p>
           </Prose>
         </Section>
-      </Container>
-    </>
+    </StadiiShell>
   );
 }

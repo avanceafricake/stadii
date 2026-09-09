@@ -3,7 +3,9 @@ import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { EventCardGrid } from '@/components/event-card';
-import { Card, Container, PageHeader, Section, SectionHeading } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Card, Section, SectionHeading } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { EmptyState, UnavailableState } from '@/components/states';
 import { searchCatalogue } from '@/lib/data/search';
 import { kindLabel } from '@/lib/format/participants';
@@ -63,19 +65,22 @@ export default async function SearchPage({
   const results = await searchCatalogue(q);
 
   return (
-    <>
-      <PageHeader title="Search" lede="Events, sports, teams and athletes, competitions and venues.">
-        <div className="mt-md">
+    <StadiiShell active={routes.search()}>
+      <PageIntro
+        title="Search"
+        lede="Events, sports, teams and athletes, competitions and venues."
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
               { name: 'Search', path: routes.search() },
             ]}
           />
-        </div>
+        }
+      />
 
-        {/* A plain GET form. No JavaScript is required to search this site. */}
-        <form action={routes.search()} method="get" role="search" className="mt-md flex max-w-prose gap-sm">
+      {/* A plain GET form. No JavaScript is required to search this site. */}
+      <form action={routes.search()} method="get" role="search" className="mb-lg flex max-w-prose gap-sm">
           <label htmlFor="q" className="sr-only">
             Search STADII
           </label>
@@ -88,17 +93,15 @@ export default async function SearchPage({
             autoComplete="off"
             className="w-full rounded-md border border-outline bg-surface px-md py-sm text-body-lg text-ink placeholder:text-ink-subtle"
           />
-          <button
-            type="submit"
-            className="rounded-md bg-action px-lg py-sm text-body-lg font-semibold text-on-action hover:bg-action-600"
-          >
-            Search
-          </button>
-        </form>
-      </PageHeader>
+        <button
+          type="submit"
+          className="rounded-md bg-action px-lg py-sm text-body-lg font-semibold text-on-action hover:bg-action-600"
+        >
+          Search
+        </button>
+      </form>
 
-      <Container>
-        {results.query.length < 2 ? (
+      {results.query.length < 2 ? (
           <Section>
             <EmptyState
               title="Type at least two characters"
@@ -165,7 +168,6 @@ export default async function SearchPage({
             />
           </>
         )}
-      </Container>
-    </>
+    </StadiiShell>
   );
 }

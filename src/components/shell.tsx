@@ -15,6 +15,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
+import { StadiiAside } from './aside';
 import { cx } from './primitives';
 import { routes } from '@/lib/routes';
 import { site } from '@/lib/site';
@@ -196,30 +197,101 @@ export function StadiiSearchBar({ className }: { className?: string }) {
 
 export function StadiiSidebar({ active }: { active?: string }) {
   return (
-    <nav aria-label="Sections" className="hidden lg:block">
-      <ul className="sticky top-[5.5rem] space-y-px p-0">
-        {NAV.map((item) => {
-          const isActive = active === item.href;
-          return (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                aria-current={isActive ? 'page' : undefined}
-                className={cx(
-                  'flex items-center gap-sm rounded-lg px-sm py-sm text-body transition-colors',
-                  isActive
-                    ? 'bg-action-50 font-semibold text-action-800'
-                    : 'text-ink-muted hover:bg-surface-sunken hover:text-ink',
-                )}
-              >
-                <Icon name={item.icon} className={isActive ? 'text-action' : undefined} />
-                {item.label}
-              </Link>
-            </li>
-          );
-        })}
+    <div className="hidden lg:block">
+      <div className="sticky top-[5.5rem] space-y-lg">
+        <nav aria-label="Sections">
+          <ul className="space-y-px p-0">
+            {NAV.map((item) => {
+              const isActive = active === item.href;
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    className={cx(
+                      'flex items-center gap-sm rounded-lg px-sm py-sm text-body transition-colors',
+                      isActive
+                        ? 'bg-action-50 font-semibold text-action-800'
+                        : 'text-ink-muted hover:bg-surface-sunken hover:text-ink',
+                    )}
+                  >
+                    <Icon name={item.icon} className={isActive ? 'text-action' : undefined} />
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        <SidebarBanner />
+      </div>
+    </div>
+  );
+}
+
+/**
+ * The standing promotion under the navigation.
+ *
+ * Built rather than placed: it is a gradient, the STADII mark and type, not a
+ * photograph. The venue research pack's Review Notes require image licensing to
+ * be confirmed before public use and it has not been, so a stock crowd shot
+ * here would be the one unlicensed asset on an otherwise careful site. The
+ * layout takes a photograph the day there is one to take — `backgroundImage` on
+ * the outer element and a scrim over it — and reads correctly without.
+ *
+ * It is part of the SHELL rather than a page, so it appears on every page in
+ * the same place. A promotion that moves around is an advert; one that always
+ * sits in the same corner is furniture, and furniture is what a reader learns
+ * to ignore politely rather than resent.
+ */
+function SidebarBanner() {
+  const features = [
+    { icon: 'ticket' as const, label: 'Easy booking' },
+    { icon: 'shield' as const, label: 'Secure payments' },
+    { icon: 'search' as const, label: 'Digital tickets' },
+  ];
+
+  return (
+    <aside
+      aria-label="About STADII"
+      className="overflow-hidden rounded-lg bg-gradient-to-b from-brand via-brand-800 to-brand-900 p-md text-ink-inverse shadow-sm"
+    >
+      <Image
+        src="/brand/mark.png"
+        alt=""
+        width={512}
+        height={512}
+        className="h-10 w-10 rounded-md bg-surface p-[2px]"
+      />
+
+      <p className="mt-sm text-title font-bold leading-tight">
+        Live sport,
+        <br />
+        unforgettable moments
+      </p>
+      <p className="mt-xs text-body text-white/70">
+        Book your tickets now and be part of the action.
+      </p>
+
+      <ul className="mt-md space-y-xs border-t border-white/15 p-0 pt-md">
+        {features.map((feature) => (
+          <li key={feature.label} className="flex items-center gap-sm text-body text-white/85">
+            <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-white/10">
+              <Icon name={feature.icon} className="h-4 w-4" />
+            </span>
+            {feature.label}
+          </li>
+        ))}
       </ul>
-    </nav>
+
+      <Link
+        href={routes.events()}
+        className="mt-md inline-flex h-11 w-full items-center justify-center gap-xs rounded-xl bg-action px-md text-body font-semibold text-on-action transition-colors hover:bg-action-600"
+      >
+        Explore events <span aria-hidden="true">→</span>
+      </Link>
+    </aside>
   );
 }
 
@@ -263,8 +335,18 @@ export function StadiiMobileNav({ active }: { active?: string }) {
 // ---------------------------------------------------------------------------
 
 /**
- * `aside` is supporting material and is the first thing to go when the screen
- * narrows — it is never the reason someone opened the page.
+ * Three columns: navigation, the page, and supporting material.
+ *
+ * The right column is NOT optional. It used to be — `aside` was a prop and two
+ * pages out of twenty-three passed one — so a three-column design rendered as
+ * two columns almost everywhere and the layout visibly changed when you clicked
+ * from the homepage to anything else. A page may still supply its own panel
+ * when it has something better to put there; it cannot leave the column empty.
+ *
+ * The collapse is deliberate rather than a shrink. The right column goes first
+ * at `xl`, because it is supporting material and never the reason someone
+ * opened the page. The sidebar goes at `lg` and becomes a bottom bar, because a
+ * thumb reaches the bottom of a screen and not the side of one.
  */
 export function StadiiShell({
   children,
@@ -272,14 +354,17 @@ export function StadiiShell({
   active,
 }: {
   children: ReactNode;
+  /** Overrides the standing panel. Omit it to get the standing one. */
   aside?: ReactNode;
   active?: string;
 }) {
   return (
-    <div className="mx-auto w-full max-w-[1440px] gap-lg px-md py-lg lg:grid lg:grid-cols-[13rem_minmax(0,1fr)] lg:px-lg xl:grid-cols-[13rem_minmax(0,1fr)_20rem]">
+    <div className="mx-auto w-full max-w-[1440px] gap-lg px-md py-lg lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:px-lg xl:grid-cols-[14rem_minmax(0,1fr)_21rem]">
       <StadiiSidebar active={active} />
       <div className="min-w-0">{children}</div>
-      {aside ? <aside className="mt-lg space-y-md xl:mt-0">{aside}</aside> : null}
+      <aside className="mt-lg space-y-md xl:mt-0">
+        <div className="xl:sticky xl:top-[5.5rem] xl:space-y-md">{aside ?? <StadiiAside />}</div>
+      </aside>
     </div>
   );
 }
@@ -290,11 +375,11 @@ export function StadiiShell({
 
 const FOOTER_GROUPS = [
   {
-    heading: 'Discover',
+    heading: 'Explore',
     links: [
       { href: routes.events(), label: 'Events' },
       { href: routes.venues(), label: 'Stadiums' },
-      { href: routes.teams(), label: 'Teams & athletes' },
+      { href: routes.teams(), label: 'Teams' },
       { href: routes.sports(), label: 'Sports' },
       { href: routes.competitions(), label: 'Competitions' },
     ],
@@ -303,6 +388,7 @@ const FOOTER_GROUPS = [
     heading: 'Support',
     links: [
       { href: routes.help(), label: 'Help centre' },
+      { href: routes.faqs(), label: 'FAQs' },
       { href: routes.contact(), label: 'Contact us' },
       { href: routes.howItWorks(), label: 'How it works' },
     ],
@@ -310,33 +396,101 @@ const FOOTER_GROUPS = [
   {
     heading: 'Legal',
     links: [
-      { href: routes.terms(), label: 'Terms & conditions' },
       { href: routes.privacy(), label: 'Privacy policy' },
+      { href: routes.terms(), label: 'Terms of use' },
+      { href: routes.refunds(), label: 'Refund policy' },
       { href: routes.about(), label: 'About STADII' },
     ],
   },
 ] as const;
 
+/**
+ * Social marks, drawn inline.
+ *
+ * Only ever rendered for an account that is configured — an icon linking to an
+ * unregistered handle sends people to whoever squatted it, and on a ticketing
+ * brand that is a fraud vector rather than a cosmetic problem. See
+ * `site.social`.
+ */
+function SocialIcon({ name }: { name: string }) {
+  const paths: Record<string, ReactNode> = {
+    X: <path d="M3 3h4.5l4.2 5.7L16.8 3H21l-6.8 8.4L21.4 21h-4.5l-4.6-6.2L7 21H3l7.2-8.9z" />,
+    Facebook: (
+      <path d="M14 8.5V7c0-.8.4-1.2 1.3-1.2H17V3h-2.6C11.7 3 11 4.6 11 6.7v1.8H9V12h2v9h3v-9h2.3l.4-3.5z" />
+    ),
+    Instagram: (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="5" />
+        <circle cx="12" cy="12" r="4" />
+        <circle cx="17.2" cy="6.8" r="1.1" />
+      </>
+    ),
+    YouTube: (
+      <>
+        <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
+        <path d="m10.5 9.5 5 2.5-5 2.5z" />
+      </>
+    ),
+    TikTok: (
+      <path d="M14 3v10.2a3.2 3.2 0 1 1-2.6-3.15V13a1 1 0 1 0 1 1V3zM14 3c.4 2.1 1.9 3.5 4 3.7v2.6c-1.6-.1-3-.7-4-1.6" />
+    ),
+    LinkedIn: (
+      <>
+        <rect x="3" y="3" width="18" height="18" rx="3" />
+        <path d="M7.5 10v7M7.5 7.2v.1M11.5 17v-4a2 2 0 0 1 4 0v4" />
+      </>
+    ),
+  };
+
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+      className="h-5 w-5"
+    >
+      {paths[name] ?? <circle cx="12" cy="12" r="9" />}
+    </svg>
+  );
+}
+
 export function StadiiFooter() {
   return (
-    <footer className="mt-xxl bg-brand text-ink-inverse">
+    <footer className="bg-brand text-ink-inverse">
       <div className="mx-auto max-w-[1440px] px-md py-xl lg:px-lg">
-        <div className="grid gap-lg sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-lg md:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)_1fr]">
           <div>
-            {/* The mark, not the lockup: the lockup has a white ground and would
-                sit in a box on this surface (brand/README.md). */}
-            <Image
-              src="/brand/mark.png"
-              alt=""
-              width={512}
-              height={512}
-              className="h-12 w-12 rounded-md bg-surface p-[3px]"
-            />
-            <p className="mt-sm text-title font-bold tracking-tight">{site.name}</p>
-            <p className="mt-xs text-body text-white/70">Scan. Book. Enjoy.</p>
-            <p className="mt-md max-w-prose text-body text-white/70">
-              Tickets and stadium access for East African sport. All times are shown in{' '}
-              {site.timezone.replace('_', ' ')}.
+            {/* The landscape lockup, as the brand requires. It is artwork on a
+                white ground, so it gets a white plate rather than being placed
+                straight onto the teal, where its own background would read as a
+                rectangle someone forgot to cut out. The plate is the fix until
+                an inverted lockup exists (brand/README.md). */}
+            <Link
+              href={routes.home()}
+              aria-label={site.name}
+              className="inline-flex rounded-md bg-surface px-sm py-xs"
+            >
+              <Image
+                src="/brand/logo-landscape.png"
+                alt={site.name}
+                width={900}
+                height={226}
+                className="h-10 w-auto"
+              />
+            </Link>
+            <p className="mt-md text-body font-medium leading-relaxed text-white/85">
+              Every event.
+              <br />
+              Every stadium.
+              <br />
+              One platform.
+            </p>
+            <p className="mt-sm text-caption text-white/55">
+              All times are shown in {site.timezone.replace('_', ' ')}.
             </p>
           </div>
 
@@ -359,12 +513,48 @@ export function StadiiFooter() {
               </ul>
             </div>
           ))}
+
+          <div>
+            <p className="text-caption font-semibold uppercase tracking-wider text-white/60">
+              Follow us
+            </p>
+            {site.social.length > 0 ? (
+              <ul className="mt-sm flex flex-wrap gap-xs p-0">
+                {site.social.map((account) => (
+                  <li key={account.label}>
+                    <a
+                      href={account.url}
+                      aria-label={`${site.name} on ${account.label}`}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-white/10 text-white/85 transition-colors hover:bg-white/20 hover:text-white"
+                    >
+                      <SocialIcon name={account.label} />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              // Honest rather than decorative. Dead social icons on a ticketing
+              // site are worse than none: the handles are unregistered, so each
+              // one is an invitation to whoever registers it first.
+              <p className="mt-sm text-body text-white/60">
+                Accounts are on the way. Until then,{' '}
+                <a
+                  href={`mailto:${site.support.email}`}
+                  className="underline underline-offset-4 hover:text-action-300"
+                >
+                  email us
+                </a>
+                .
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="mt-xl flex flex-col gap-xs border-t border-white/15 pt-md text-caption text-white/60 sm:flex-row sm:items-center sm:justify-between">
           <p>
-            © {new Date().getFullYear()} {site.name}. Every ticket is confirmed by STADII at the
-            point of sale and at the gate.
+            © {new Date().getFullYear()} {site.name}. All rights reserved.
           </p>
           <p>
             <a href={`mailto:${site.support.email}`} className="underline hover:text-action-300">

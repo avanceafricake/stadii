@@ -80,7 +80,7 @@ export const loadEventPage = cache(async (slug: string): Promise<EventPageData> 
   const records = await getParticipantsByIds(ordered.map((p) => p.participantId));
   const byId = new Map<string, Participant>(records.data.map((p) => [p.id as string, p]));
 
-  const participants: ParticipantView[] = ordered.map((entry) => {
+  const fromSubcollection: ParticipantView[] = ordered.map((entry) => {
     const record = byId.get(entry.participantId as string);
     return {
       id: entry.id as string,
@@ -92,6 +92,37 @@ export const loadEventPage = cache(async (slug: string): Promise<EventPageData> 
       slug: record?.slug,
     };
   });
+
+  /**
+   * The denormalised copy, when the subcollection has nothing.
+   *
+   * The subcollection stays authoritative — it is what carries roles and
+   * display order, and it is what the JSON-LD is built from. But an event whose
+   * subcollection was never written still has `participantSummaries`, and the
+   * page was then drawing "Gor Mahia vs AFC Leopards" in its hero and
+   * "participants have not been announced" underneath it. A page that
+   * contradicts itself in two adjacent blocks is worse than either answer.
+   *
+   * Nothing is invented here: the summaries were written by the backend from
+   * the same participants. They simply carry no slug, so these entries do not
+   * link anywhere — which is honest, because without the record there is no
+   * page to link to.
+   */
+  const fromSummaries: ParticipantView[] = (event.participantSummaries ?? []).map((summary) => {
+    const record = byId.get(summary.participantId as string);
+    return {
+      id: summary.participantId as string,
+      name: record?.displayName ?? summary.displayName,
+      shortName: record?.shortName ?? summary.shortName,
+      crestUrl: record?.crestUrl ?? summary.crestUrl,
+      role: summary.role,
+      kind: record?.kind,
+      slug: record?.slug,
+    };
+  });
+
+  const participants =
+    fromSubcollection.length > 0 ? fromSubcollection : fromSummaries;
 
   const venueAreas = venue.data ? await listVenueRootAreas(venue.data.id) : null;
 

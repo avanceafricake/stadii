@@ -1,15 +1,18 @@
-import { Container, PageHeader, Section } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { StadiiShell } from '@/components/shell';
 import { CardSkeletonGrid } from '@/components/states';
 
+/**
+ * The same frame the loaded page uses.
+ *
+ * A skeleton in a different layout is a page that jumps when the data lands,
+ * which is worse than a slightly longer blank.
+ */
 export default function Loading() {
   return (
-    <>
-      <PageHeader title="Upcoming events" lede="Loading published events…" />
-      <Container>
-        <Section>
-          <CardSkeletonGrid count={9} />
-        </Section>
-      </Container>
-    </>
+    <StadiiShell>
+      <PageIntro title="Upcoming events" lede="Loading published events…" />
+      <CardSkeletonGrid count={9} />
+    </StadiiShell>
   );
 }

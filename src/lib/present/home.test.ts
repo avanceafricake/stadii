@@ -9,7 +9,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import { isMatch, toEventCard, toUpcomingItem } from './home';
+import { isMatch, toEventCard, toStadiumCard, toUpcomingItem } from './home';
 
 type TestEvent = Parameters<typeof toEventCard>[0];
 
@@ -24,6 +24,12 @@ function anEvent(over: Partial<TestEvent> = {}): TestEvent {
     startsAt: KICK_OFF,
     timezone: 'Africa/Nairobi',
     venueSummary: { venueId: 'ven_1', name: 'Kasarani', city: 'Nairobi' },
+    // The three axes are always stored (ADR-0016). Leaving them off a fixture
+    // makes the ordinary case look extraordinary, which is the opposite of
+    // what the card is meant to say.
+    publicationStatus: 'PUBLISHED',
+    operationalStatus: 'SCHEDULED',
+    salesStatus: 'ON_SALE',
     participantSummaries: [
       { participantId: 'par_gor', displayName: 'Gor Mahia' },
       { participantId: 'par_afc', displayName: 'AFC Leopards' },
@@ -98,5 +104,85 @@ describe('the upcoming list', () => {
 
     expect(item.day).toBe('03');
     expect(item.month).toBe('OCT');
+  });
+});
+
+describe('artwork goes where crests cannot', () => {
+  it('a general event carries its hero image', () => {
+    const card = toEventCard(
+      anEvent({
+        participantSummaries: [],
+        heroImageUrl: 'https://example.test/meet.jpg',
+      } as Partial<TestEvent>),
+      category,
+    );
+    expect(card.imageUrl).toBe('https://example.test/meet.jpg');
+    expect(card.sides).toBeUndefined();
+  });
+
+  it('a fixture shows its sides even when it also has artwork', () => {
+    // A photograph of a crowd is not what someone is looking for when they are
+    // looking for Gor Mahia. The crests win.
+    const card = toEventCard(
+      anEvent({ heroImageUrl: 'https://example.test/crowd.jpg' } as Partial<TestEvent>),
+      category,
+    );
+    expect(card.imageUrl).toBeUndefined();
+    expect(card.sides).toHaveLength(2);
+  });
+});
+
+describe('a card says when something is wrong, and stays quiet when it is not', () => {
+  it('an ordinary on-sale fixture carries no notices', () => {
+    expect(toEventCard(anEvent(), category).notices).toEqual([]);
+  });
+
+  it('a postponed event that is still selling says both things', () => {
+    const card = toEventCard(
+      anEvent({ operationalStatus: 'POSTPONED', salesStatus: 'SUSPENDED' } as Partial<TestEvent>),
+      category,
+    );
+    // Two facts, never merged into one word (ADR-0016).
+    expect(card.notices).toHaveLength(2);
+    expect(card.notices?.map((a) => a.axis)).toEqual(['Event', 'Tickets']);
+  });
+});
+
+describe('a stadium card', () => {
+  type TestVenue = Parameters<typeof toStadiumCard>[0];
+
+  const aVenue = (over: Partial<TestVenue> = {}): TestVenue =>
+    ({
+      id: 'ven_1',
+      slug: 'kasarani',
+      name: 'Kasarani',
+      address: { line1: 'Thika Road', city: 'Nairobi', county: 'Nairobi', countryCode: 'KE' },
+      ...over,
+    }) as unknown as TestVenue;
+
+  it('carries the photograph when there is one', () => {
+    expect(toStadiumCard(aVenue({ imageUrl: 'https://example.test/k.jpg' })).imageUrl).toBe(
+      'https://example.test/k.jpg',
+    );
+  });
+
+  it('takes one sentence from the description, not the essay', () => {
+    const card = toStadiumCard(
+      aVenue({
+        description: 'Kasarani is a sports complex in Nairobi. It seats 60,000. More text.',
+      }),
+    );
+    expect(card.blurb).toBe('Kasarani is a sports complex in Nairobi.');
+  });
+
+  it('has no blurb when nobody has written one', () => {
+    expect(toStadiumCard(aVenue()).blurb).toBeUndefined();
+    expect(toStadiumCard(aVenue({ description: '   ' })).blurb).toBeUndefined();
+  });
+
+  it('truncates a single very long sentence rather than running off the card', () => {
+    const card = toStadiumCard(aVenue({ description: `${'a'.repeat(300)}` }));
+    expect(card.blurb!.length).toBeLessThanOrEqual(140);
+    expect(card.blurb!.endsWith('…')).toBe(true);
   });
 });

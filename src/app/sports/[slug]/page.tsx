@@ -5,7 +5,9 @@ import type { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { EventCardGrid } from '@/components/event-card';
 import { LoadedList } from '@/components/loaded';
-import { Card, Container, PageHeader, Section, SectionHeading } from '@/components/primitives';
+import { PageIntro } from '@/components/cards';
+import { Card, Section, SectionHeading } from '@/components/primitives';
+import { StadiiShell } from '@/components/shell';
 import { UnavailableState } from '@/components/states';
 import {
   getSportBySlug,
@@ -48,11 +50,9 @@ export default async function SportPage({ params }: Params) {
   if (!sport) {
     if (sportResult.unavailable) {
       return (
-        <Container>
           <Section>
             <UnavailableState what="this sport" />
           </Section>
-        </Container>
       );
     }
     notFound();
@@ -65,9 +65,9 @@ export default async function SportPage({ params }: Params) {
   ]);
 
   return (
-    <>
-      <PageHeader title={sport.name} lede={`Upcoming ${sport.name.toLowerCase()} on STADII.`}>
-        <div className="mt-md">
+    <StadiiShell active={routes.sports()}>
+      <PageIntro title={sport.name} lede={`Upcoming ${sport.name.toLowerCase()} on STADII.`}
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
@@ -75,10 +75,8 @@ export default async function SportPage({ params }: Params) {
               { name: sport.name, path: routes.sport(sport.slug) },
             ]}
           />
-        </div>
-      </PageHeader>
-
-      <Container>
+        }
+      />
         <Section labelledBy="sport-events">
           <SectionHeading id="sport-events">Coming up</SectionHeading>
           <LoadedList
@@ -142,7 +140,6 @@ export default async function SportPage({ params }: Params) {
             )}
           </LoadedList>
         </Section>
-      </Container>
-    </>
+    </StadiiShell>
   );
 }

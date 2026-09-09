@@ -5,7 +5,8 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { EventCardGrid } from '@/components/event-card';
 import { JsonLdScript } from '@/components/json-ld';
 import { LoadedList } from '@/components/loaded';
-import { Container, PageHeader, Section, SectionHeading } from '@/components/primitives';
+import { EditorialHero, PageIntro, SectionHeader } from '@/components/cards';
+import { StadiiShell } from '@/components/shell';
 import { UnavailableState } from '@/components/states';
 import { VenuePanel } from '@/components/venue-panel';
 import {
@@ -16,6 +17,7 @@ import {
 import { buildMetadata } from '@/lib/seo/metadata';
 import { absoluteUrl } from '@/lib/site';
 import { parseSlug, routes } from '@/lib/routes';
+import { placeLine } from '@/lib/format/format';
 
 export const revalidate = 900;
 
@@ -50,11 +52,9 @@ export default async function VenuePage({ params }: Params) {
   if (!venue) {
     if (result.unavailable) {
       return (
-        <Container>
-          <Section>
-            <UnavailableState what="this venue" />
-          </Section>
-        </Container>
+        <StadiiShell active={routes.venues()}>
+          <UnavailableState what="this stadium" />
+        </StadiiShell>
       );
     }
     notFound();
@@ -66,7 +66,10 @@ export default async function VenuePage({ params }: Params) {
   ]);
 
   return (
-    <>
+    <StadiiShell
+      active={routes.venues()}
+      aside={<VenuePanel venue={venue} areas={areas.data} showLink={false} />}
+    >
       <JsonLdScript
         id="ld-venue"
         data={{
@@ -100,40 +103,49 @@ export default async function VenuePage({ params }: Params) {
         }}
       />
 
-      <PageHeader
+      <PageIntro
         title={venue.name}
-        lede={[venue.address?.city, venue.address?.county].filter(Boolean).join(', ')}
-      >
-        <div className="mt-md">
+        lede={placeLine(venue.address?.city, venue.address?.county)}
+        crumbs={
           <Breadcrumbs
             crumbs={[
               { name: 'Home', path: routes.home() },
-              { name: 'Venues', path: routes.venues() },
+              { name: 'Stadiums', path: routes.venues() },
               { name: venue.name, path: routes.venue(venue.slug) },
             ]}
           />
-        </div>
-      </PageHeader>
+        }
+      />
 
-      <Container>
-        <div className="grid gap-lg py-xl lg:grid-cols-[1fr_22rem]">
-          <Section className="py-0" labelledBy="venue-events">
-            <SectionHeading id="venue-events">Coming up here</SectionHeading>
-            <LoadedList
-              result={events}
-              what="upcoming events at this venue"
-              emptyTitle="Nothing scheduled"
-              emptyBody={`No events are currently published at ${venue.name}.`}
-            >
-              {(items) => <EventCardGrid events={items} />}
-            </LoadedList>
-          </Section>
+      {/* Photograph and prose, either, both or neither. A ground with nothing
+          written about it yet gets no empty picture frame and no placeholder
+          paragraph — the page simply starts at what is on. */}
+      <EditorialHero
+        imageUrl={venue.imageUrl}
+        imageAlt={`${venue.name}`}
+        description={venue.description}
+        facts={[
+          ...(typeof venue.totalCapacity === 'number'
+            ? [{ label: 'Capacity', value: venue.totalCapacity.toLocaleString('en-KE') }]
+            : []),
+          ...(venue.address?.county ? [{ label: 'County', value: venue.address.county }] : []),
+          ...(venue.alsoKnownAs && venue.alsoKnownAs.length > 0
+            ? [{ label: 'Also known as', value: venue.alsoKnownAs.join(', ') }]
+            : []),
+        ]}
+      />
 
-          <aside className="space-y-md">
-            <VenuePanel venue={venue} areas={areas.data} showLink={false} />
-          </aside>
-        </div>
-      </Container>
-    </>
+      <section aria-labelledby="venue-events">
+        <SectionHeader title="Coming up here" />
+        <LoadedList
+          result={events}
+          what="upcoming events at this venue"
+          emptyTitle="Nothing scheduled"
+          emptyBody={`No events are currently published at ${venue.name}.`}
+        >
+          {(items) => <EventCardGrid events={items} />}
+        </LoadedList>
+      </section>
+    </StadiiShell>
   );
 }
