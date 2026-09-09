@@ -180,7 +180,26 @@ const config: Config = {
         ],
       },
       maxWidth: {
-        content: '72rem',
+        /**
+         * The page band, and the arithmetic behind it.
+         *
+         * The design reference is a 1440 canvas, but the SITE is not 1440 wide
+         * — on a 1920 monitor that reads as a stretched page rather than a
+         * designed one. The content band is 1280 and the gutters sit outside
+         * it, so this is 1280 + 2 x 32.
+         *
+         *   1280  band
+         *   - 224  sidebar        (14rem, spec 220-240)
+         *   - 304  right panel    (19rem, spec 280-320)
+         *   -  48  two 24px gaps
+         *   = 704  main column    (spec 700-850)
+         *
+         * Changing any one of these four numbers moves the main column, which
+         * is the one a reader actually reads, so they are written down together
+         * rather than spread across four class attributes.
+         */
+        shell: '84rem',
+        content: '84rem',
         prose: '46rem',
       },
     },

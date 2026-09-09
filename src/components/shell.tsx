@@ -120,7 +120,7 @@ export function Icon({ name, className }: { name: IconName; className?: string }
 export function StadiiHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-outline-subtle bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-[1440px] items-center gap-md px-md lg:px-lg">
+      <div className="mx-auto flex h-16 max-w-shell items-center gap-md px-md sm:px-lg lg:px-xl">
         <Link href={routes.home()} className="flex shrink-0 items-center" aria-label={site.name}>
           <Image
             src="/brand/logo-landscape.png"
@@ -306,7 +306,7 @@ export function StadiiMobileNav({ active }: { active?: string }) {
       aria-label="Sections"
       className="sticky bottom-0 z-30 border-t border-outline-subtle bg-surface lg:hidden"
     >
-      <ul className="mx-auto flex max-w-[1440px] p-0">
+      <ul className="mx-auto flex max-w-shell p-0">
         {items.map((item) => {
           const isActive = active === item.href;
           return (
@@ -347,6 +347,13 @@ export function StadiiMobileNav({ active }: { active?: string }) {
  * at `xl`, because it is supporting material and never the reason someone
  * opened the page. The sidebar goes at `lg` and becomes a bottom bar, because a
  * thumb reaches the bottom of a screen and not the side of one.
+ *
+ * Widths: `max-w-shell` is 1344 — a 1280 content band plus 32px gutters — so
+ * the page stops growing well before the edge of a 1920 monitor. Inside it,
+ * 224 sidebar + 304 panel + two 24px gaps leaves a 704px main column, which is
+ * about 85 characters of body text: long enough not to feel cramped, short
+ * enough to still be a column. The arithmetic lives on `maxWidth.shell` in
+ * tailwind.config.ts, where all four numbers are together.
  */
 export function StadiiShell({
   children,
@@ -359,7 +366,7 @@ export function StadiiShell({
   active?: string;
 }) {
   return (
-    <div className="mx-auto w-full max-w-[1440px] gap-lg px-md py-lg lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:px-lg xl:grid-cols-[14rem_minmax(0,1fr)_21rem]">
+    <div className="mx-auto w-full max-w-shell gap-lg px-md py-lg sm:px-lg lg:grid lg:grid-cols-[14rem_minmax(0,1fr)] lg:px-xl xl:grid-cols-[14rem_minmax(0,1fr)_19rem]">
       <StadiiSidebar active={active} />
       <div className="min-w-0">{children}</div>
       <aside className="mt-lg space-y-md xl:mt-0">
@@ -461,7 +468,7 @@ function SocialIcon({ name }: { name: string }) {
 export function StadiiFooter() {
   return (
     <footer className="bg-brand text-ink-inverse">
-      <div className="mx-auto max-w-[1440px] px-md py-xl lg:px-lg">
+      <div className="mx-auto max-w-shell px-md py-xl sm:px-lg lg:px-xl">
         <div className="grid gap-lg md:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)_1fr]">
           <div>
             {/* The landscape lockup, as the brand requires. It is artwork on a
