@@ -1,12 +1,12 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { LoadedList } from '@/components/loaded';
-import { CardGrid, PageIntro } from '@/components/cards';
-import { Card } from '@/components/primitives';
+import { CardGrid, PageIntro, StadiiCategoryCard } from '@/components/cards';
+import { sportIconName } from '@/components/icons';
 import { StadiiShell } from '@/components/shell';
-import { listSports } from '@/lib/firestore/queries';
+import { listSports, listUpcomingEvents } from '@/lib/firestore/queries';
+import { tally, upcomingLabel } from '@/lib/present/counts';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
 
@@ -28,7 +28,11 @@ export const metadata: Metadata = buildMetadata({
  * special cases bolted onto a football model.
  */
 export default async function SportsPage() {
-  const sports = await listSports();
+  const [sports, events] = await Promise.all([
+    listSports(),
+    listUpcomingEvents({ limit: 200 }),
+  ]);
+  const counts = tally(events.data);
 
   return (
     <StadiiShell active={routes.sports()}>
@@ -53,20 +57,25 @@ export default async function SportsPage() {
             emptyBody="Sports appear here as soon as an organiser publishes an event in one."
           >
             {(items) => (
-              <CardGrid>
-                {items.map((sport) => (
-                  <Card as="li" key={sport.id}>
-                    <h2 className="text-body-lg font-semibold">
-                      <Link href={routes.sport(sport.slug)} className="hover:text-brand-700">
-                        {sport.name}
-                      </Link>
-                    </h2>
-                    <p className="mt-xs text-body text-ink-muted">
-                      See upcoming {sport.name.toLowerCase()} events, teams and athletes.
-                    </p>
-                  </Card>
-                ))}
-              </CardGrid>
+              <>
+                <p className="mb-md text-body text-ink-muted">
+                  {items.length === 1 ? '1 sport' : `${items.length} sports`}
+                  {' · '}
+                  {upcomingLabel(counts.total)}
+                </p>
+                <CardGrid columns={4}>
+                  {items.map((sport) => (
+                    <li key={String(sport.id)} className="h-full">
+                      <StadiiCategoryCard
+                        href={routes.sport(sport.slug)}
+                        name={sport.name}
+                        icon={sportIconName(String(sport.slug))}
+                        eventCount={counts.bySport.get(String(sport.id))}
+                      />
+                    </li>
+                  ))}
+                </CardGrid>
+              </>
             )}
           </LoadedList>
     </StadiiShell>

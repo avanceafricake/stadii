@@ -5,7 +5,8 @@ import { CardGrid, PageIntro, StadiiTeamCard } from '@/components/cards';
 import { LoadedList } from '@/components/loaded';
 import { StadiiShell } from '@/components/shell';
 import { kindLabel } from '@/lib/format/participants';
-import { listParticipants } from '@/lib/firestore/queries';
+import { listParticipants, listUpcomingEvents } from '@/lib/firestore/queries';
+import { tally, upcomingLabel } from '@/lib/present/counts';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
 
@@ -27,7 +28,11 @@ export const metadata: Metadata = buildMetadata({
  * lists all four, and each card says which it is.
  */
 export default async function TeamsPage() {
-  const participants = await listParticipants({ limit: 200 });
+  const [participants, events] = await Promise.all([
+    listParticipants({ limit: 200 }),
+    listUpcomingEvents({ limit: 200 }),
+  ]);
+  const counts = tally(events.data);
 
   return (
     <StadiiShell active={routes.teams()}>
@@ -52,7 +57,13 @@ export default async function TeamsPage() {
         emptyBody="Teams, clubs and athletes appear here as organisers add them to the catalogue."
       >
         {(items) => (
-          <CardGrid>
+          <>
+            <p className="mb-md text-body text-ink-muted">
+              {items.length === 1 ? '1 team or athlete' : `${items.length} teams and athletes`}
+              {' · '}
+              {upcomingLabel(counts.total, 'fixture')}
+            </p>
+            <CardGrid>
             {items.map((participant) => (
               <li key={String(participant.id)} className="h-full">
                 <StadiiTeamCard
@@ -62,11 +73,13 @@ export default async function TeamsPage() {
                     kindLabel: kindLabel(participant.kind),
                     crestUrl: participant.crestUrl,
                     countryCode: participant.countryCode,
+                    eventCount: counts.byParticipant.get(String(participant.id)),
                   }}
                 />
               </li>
             ))}
-          </CardGrid>
+            </CardGrid>
+          </>
         )}
       </LoadedList>
     </StadiiShell>

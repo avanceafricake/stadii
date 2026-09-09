@@ -1,12 +1,11 @@
-import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { LoadedList } from '@/components/loaded';
-import { CardGrid, PageIntro } from '@/components/cards';
-import { Card } from '@/components/primitives';
+import { CardGrid, PageIntro, StadiiCategoryCard } from '@/components/cards';
 import { StadiiShell } from '@/components/shell';
-import { listCompetitions } from '@/lib/firestore/queries';
+import { listCompetitions, listUpcomingEvents } from '@/lib/firestore/queries';
+import { tally, upcomingLabel } from '@/lib/present/counts';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
 
@@ -20,7 +19,11 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function CompetitionsPage() {
-  const competitions = await listCompetitions();
+  const [competitions, events] = await Promise.all([
+    listCompetitions(),
+    listUpcomingEvents({ limit: 200 }),
+  ]);
+  const counts = tally(events.data);
 
   return (
     <StadiiShell active={routes.competitions()}>
@@ -45,23 +48,27 @@ export default async function CompetitionsPage() {
             emptyBody="Competitions appear here once an organiser sets one up."
           >
             {(items) => (
-              <CardGrid>
-                {items.map((competition) => (
-                  <Card as="li" key={competition.id}>
-                    <h2 className="text-body-lg font-semibold">
-                      <Link
+              <>
+                <p className="mb-md text-body text-ink-muted">
+                  {items.length === 1 ? '1 competition' : `${items.length} competitions`}
+                  {' · '}
+                  {upcomingLabel(counts.total, 'fixture')}
+                </p>
+                <CardGrid columns={4}>
+                  {items.map((competition) => (
+                    <li key={String(competition.id)} className="h-full">
+                      <StadiiCategoryCard
                         href={routes.competition(competition.slug)}
-                        className="hover:text-brand-700"
-                      >
-                        {competition.name}
-                      </Link>
-                    </h2>
-                    <p className="mt-xs text-caption uppercase tracking-wide text-ink-subtle">
-                      {competition.format?.toLowerCase().replace(/_/g, ' ')}
-                    </p>
-                  </Card>
-                ))}
-              </CardGrid>
+                        name={competition.name}
+                        detail={competition.format?.toLowerCase().replace(/_/g, ' ')}
+                        icon="trophy"
+                        noun="fixture"
+                        eventCount={counts.byCompetition.get(String(competition.id))}
+                      />
+                    </li>
+                  ))}
+                </CardGrid>
+              </>
             )}
           </LoadedList>
     </StadiiShell>

@@ -4,7 +4,8 @@ import { Breadcrumbs } from '@/components/breadcrumbs';
 import { CardGrid, PageIntro, StadiiStadiumCard } from '@/components/cards';
 import { LoadedList } from '@/components/loaded';
 import { StadiiShell } from '@/components/shell';
-import { listVenues } from '@/lib/firestore/queries';
+import { listUpcomingEvents, listVenues } from '@/lib/firestore/queries';
+import { tally, upcomingLabel } from '@/lib/present/counts';
 import { toStadiumCard } from '@/lib/present/home';
 import { buildMetadata } from '@/lib/seo/metadata';
 import { routes } from '@/lib/routes';
@@ -23,7 +24,13 @@ export const metadata: Metadata = buildMetadata({
 });
 
 export default async function VenuesPage() {
-  const venues = await listVenues();
+  // One events read, counted per venue. See lib/present/counts.ts for why this
+  // is not a count query per row.
+  const [venues, events] = await Promise.all([
+    listVenues(),
+    listUpcomingEvents({ limit: 200 }),
+  ]);
+  const counts = tally(events.data);
 
   return (
     <StadiiShell active={routes.venues()}>
@@ -51,11 +58,15 @@ export default async function VenuesPage() {
           <>
             <p className="mb-md text-body text-ink-muted">
               {items.length === 1 ? '1 stadium' : `${items.length} stadiums`}
+              {' · '}
+              {upcomingLabel(counts.total)}
             </p>
             <CardGrid columns={4}>
               {items.map((venue) => (
                 <li key={String(venue.id)} className="h-full">
-                  <StadiiStadiumCard stadium={toStadiumCard(venue)} />
+                  <StadiiStadiumCard
+                    stadium={toStadiumCard(venue, counts.byVenue.get(String(venue.id)))}
+                  />
                 </li>
               ))}
             </CardGrid>

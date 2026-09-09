@@ -17,6 +17,7 @@
     "@stadii/design-tokens": "*",
     "@stadii/shared-constants": "*",
     "@stadii/shared-models": "*",
+    "@tabler/icons-react": "^3.46.0",
     "firebase": "^11.3.0",
     "next": "^15.1.6",
     "react": "^19.0.0",

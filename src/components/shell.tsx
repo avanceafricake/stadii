@@ -16,6 +16,7 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 
 import { StadiiAside } from './aside';
+import { Icon, type IconName } from './icons';
 import { cx } from './primitives';
 import { routes } from '@/lib/routes';
 import { site } from '@/lib/site';
@@ -31,87 +32,13 @@ import { site } from '@/lib/site';
  * they lead is the better trade.
  */
 const NAV = [
-  { href: routes.home(), label: 'Home', icon: 'home' },
-  { href: routes.events(), label: 'Events', icon: 'calendar' },
-  { href: routes.venues(), label: 'Stadiums', icon: 'stadium' },
-  { href: routes.sports(), label: 'Sports', icon: 'ball' },
-  { href: routes.teams(), label: 'Teams', icon: 'shield' },
-  { href: routes.competitions(), label: 'Competitions', icon: 'trophy' },
+  { href: routes.home(), label: 'Home', icon: 'home' as IconName },
+  { href: routes.events(), label: 'Events', icon: 'calendar' as IconName },
+  { href: routes.venues(), label: 'Stadiums', icon: 'stadium' as IconName },
+  { href: routes.sports(), label: 'Sports', icon: 'ball' as IconName },
+  { href: routes.teams(), label: 'Teams', icon: 'users' as IconName },
+  { href: routes.competitions(), label: 'Competitions', icon: 'trophy' as IconName },
 ] as const;
-
-type IconName = (typeof NAV)[number]['icon'] | 'search' | 'bell' | 'user' | 'ticket';
-
-/**
- * One icon family, drawn inline.
- *
- * An icon font or a sprite sheet would be a network request on the critical
- * path of a page whose whole job is to load fast on a Kenyan mobile connection.
- * These are a few hundred bytes of markup.
- */
-export function Icon({ name, className }: { name: IconName; className?: string }) {
-  const paths: Record<IconName, ReactNode> = {
-    home: <path d="M3 10.5 12 3l9 7.5V21a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z" />,
-    calendar: (
-      <>
-        <rect x="3" y="5" width="18" height="16" rx="2" />
-        <path d="M3 10h18M8 3v4M16 3v4" />
-      </>
-    ),
-    stadium: (
-      <>
-        <ellipse cx="12" cy="9" rx="9" ry="4" />
-        <path d="M3 9v6c0 2.2 4 4 9 4s9-1.8 9-4V9" />
-      </>
-    ),
-    ball: (
-      <>
-        <circle cx="12" cy="12" r="9" />
-        <path d="m12 7 4 3-1.5 5h-5L8 10z" />
-      </>
-    ),
-    shield: <path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z" />,
-    trophy: (
-      <>
-        <path d="M7 4h10v5a5 5 0 0 1-10 0z" />
-        <path d="M7 6H4v1a3 3 0 0 0 3 3M17 6h3v1a3 3 0 0 1-3 3M10 19h4M12 14v5" />
-      </>
-    ),
-    search: (
-      <>
-        <circle cx="11" cy="11" r="7" />
-        <path d="m20 20-3.5-3.5" />
-      </>
-    ),
-    bell: <path d="M18 16V11a6 6 0 1 0-12 0v5l-2 3h16zM10 22h4" />,
-    user: (
-      <>
-        <circle cx="12" cy="8" r="4" />
-        <path d="M4 21c0-4 3.6-6 8-6s8 2 8 6" />
-      </>
-    ),
-    ticket: (
-      <>
-        <path d="M3 8a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2a2 2 0 0 0 0-4z" />
-        <path d="M15 6v12" />
-      </>
-    ),
-  };
-
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.6"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-      className={cx('h-5 w-5 shrink-0', className)}
-    >
-      {paths[name]}
-    </svg>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Header

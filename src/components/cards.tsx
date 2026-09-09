@@ -15,7 +15,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 
-import { Icon } from './shell';
+import { Icon, type IconName } from './icons';
 import { StatusBadge } from './event-status';
 import { RemoteImage } from './remote-image';
 import { cx } from './primitives';
@@ -322,6 +322,8 @@ export interface StadiumCardData {
   readonly imageUrl?: string;
   /** One sentence. The rest lives on the stadium's own page. */
   readonly blurb?: string;
+  /** Upcoming events here. The reason a visitor is on this page at all. */
+  readonly eventCount?: number;
 }
 
 export function StadiiStadiumCard({ stadium }: { stadium: StadiumCardData }) {
@@ -363,11 +365,17 @@ export function StadiiStadiumCard({ stadium }: { stadium: StadiumCardData }) {
           // neighbours.
           <p className="line-clamp-2 text-body text-ink-muted">{stadium.blurb}</p>
         ) : null}
-        {stadium.capacity ? (
-          <p className="mt-auto pt-xs text-caption text-ink-subtle">
-            Capacity {stadium.capacity.toLocaleString('en-KE')}
-          </p>
-        ) : null}
+        {/* Capacity, then what is on. Capacity says what kind of place this
+            is; the count says whether there is any reason to go. The count is
+            the louder of the two because it is the one that is actionable. */}
+        <div className="mt-auto flex flex-wrap items-center gap-x-sm gap-y-xs pt-sm">
+          {stadium.capacity ? (
+            <span className="text-caption text-ink-subtle">
+              Capacity {stadium.capacity.toLocaleString('en-KE')}
+            </span>
+          ) : null}
+          <CountBadge count={stadium.eventCount} />
+        </div>
       </div>
     </article>
   );
@@ -377,6 +385,31 @@ export function StadiiStadiumCard({ stadium }: { stadium: StadiumCardData }) {
 // Team cards
 // ---------------------------------------------------------------------------
 
+/**
+ * "3 events" in green, "No events yet" in grey.
+ *
+ * The colour is doing work: green is this product's "press this" and a stadium
+ * with fixtures is pressable, while one without is a page that will not sell
+ * anything today. A single grey pill for both would make the reader read the
+ * number every time to find out which they were looking at.
+ */
+export function CountBadge({ count, noun = 'event' }: { count?: number; noun?: string }) {
+  const has = Boolean(count);
+  return (
+    <span
+      className={cx(
+        'inline-flex items-center gap-xs rounded-pill px-sm py-[3px] text-caption font-semibold',
+        has ? 'bg-action-50 text-action-800' : 'bg-surface-sunken text-ink-subtle',
+      )}
+    >
+      <Icon name="calendar" className="h-3.5 w-3.5" />
+      {has
+        ? `${count} ${count === 1 ? noun : `${noun}s`}`
+        : `No ${noun}s yet`}
+    </span>
+  );
+}
+
 export interface TeamCardData {
   readonly slug: string;
   readonly name: string;
@@ -384,6 +417,8 @@ export interface TeamCardData {
   readonly kindLabel: string;
   readonly crestUrl?: string;
   readonly countryCode?: string;
+  /** Upcoming fixtures featuring this team, so a supporter can plan ahead. */
+  readonly eventCount?: number;
 }
 
 /**
@@ -410,6 +445,9 @@ export function StadiiTeamCard({ team }: { team: TeamCardData }) {
         <p className="mt-[2px] text-caption uppercase tracking-wide text-ink-subtle">
           {[team.kindLabel, team.countryCode].filter(Boolean).join(' · ')}
         </p>
+        <div className="mt-sm">
+          <CountBadge count={team.eventCount} noun="fixture" />
+        </div>
       </div>
     </article>
   );
@@ -940,5 +978,59 @@ export function EventHero({ event, action }: { event: EventHeroData; action?: Re
         </div>
       </div>
     </section>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Category cards
+// ---------------------------------------------------------------------------
+
+/**
+ * A sport or a competition: a mark, a name, and what is on.
+ *
+ * Sports and competitions are the same shape of thing on this site — a way in
+ * to a subset of the catalogue — so they get the same card rather than two that
+ * drift. The icon comes from the sport's slug where one is known and falls back
+ * to a trophy; sports are backend data and this app does not decide which
+ * exist, so an unrecognised one still renders (`sportIconName`).
+ */
+export function StadiiCategoryCard({
+  href,
+  name,
+  detail,
+  icon,
+  eventCount,
+  noun = 'event',
+}: {
+  href: string;
+  name: string;
+  detail?: string;
+  icon: IconName;
+  eventCount?: number;
+  noun?: string;
+}) {
+  return (
+    <article className="flex h-full flex-col gap-sm rounded-lg border border-outline-subtle bg-surface p-md shadow-sm transition-shadow hover:shadow-md">
+      <span
+        className={cx(
+          'inline-flex h-12 w-12 items-center justify-center rounded-xl',
+          eventCount ? 'bg-action-50 text-action-800' : 'bg-surface-sunken text-ink-subtle',
+        )}
+      >
+        <Icon name={icon} className="h-6 w-6" />
+      </span>
+
+      <h3 className="text-body-lg font-bold leading-snug text-ink">
+        <Link href={href} className="hover:underline">
+          {name}
+        </Link>
+      </h3>
+
+      {detail ? <p className="text-caption uppercase tracking-wide text-ink-subtle">{detail}</p> : null}
+
+      <div className="mt-auto pt-xs">
+        <CountBadge count={eventCount} noun={noun} />
+      </div>
+    </article>
   );
 }

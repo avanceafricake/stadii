@@ -93,12 +93,13 @@ export function toUpcomingItem(event: Event): UpcomingItem {
   };
 }
 
-export function toStadiumCard(venue: Venue): StadiumCardData {
+export function toStadiumCard(venue: Venue, eventCount?: number): StadiumCardData {
   return {
     slug: String(venue.slug),
     name: venue.name,
     locality: placeLine(venue.address?.city, venue.address?.county),
     capacity: venue.totalCapacity,
+    eventCount,
     imageUrl: venue.imageUrl,
     // The first sentence, not the whole essay. A card is a promise that there
     // is more on the other side of it; pasting the full description in makes
