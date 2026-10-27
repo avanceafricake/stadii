@@ -31,6 +31,18 @@ export interface User extends Timestamped, Versioned {
   readonly displayName?: string;
   readonly status: UserStatus;
   readonly lastSeenAt?: Instant;
+  /**
+   * When the account holder asked to be erased, if they have.
+   *
+   * A timestamp rather than a status, because the account stays fully usable
+   * during the grace period: somebody who has a ticket for Saturday and asks
+   * to be deleted on Thursday must still get through the turnstile. Status
+   * becomes DELETED only when the erasure actually runs.
+   *
+   * Clearing this field is how a request is cancelled, which is why it is the
+   * only piece of state the whole mechanism needs.
+   */
+  readonly deletionRequestedAt?: Instant;
 }
 
 export interface Organization extends Timestamped, Versioned {

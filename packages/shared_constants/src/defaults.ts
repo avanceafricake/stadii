@@ -33,6 +33,15 @@ export const SEED_PLATFORM_CONFIG = {
   gaShardMax: 20,
   transferOfferTtlHours: 72,
   maxHoldExtensions: 1,
+  /**
+   * How long an account survives after its holder asks to be erased.
+   *
+   * Thirty days is a grace period, not a processing delay: it exists so that
+   * somebody who changes their mind, or whose account was deleted by someone
+   * with their phone, can still get it back. The account stays usable
+   * throughout, and the erasure is irreversible once it runs.
+   */
+  accountDeletionGraceDays: 30,
   featureFlags: {} as Record<string, boolean>,
 } as const;
 

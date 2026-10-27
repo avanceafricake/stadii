@@ -25,6 +25,7 @@ export const routes = {
   help: () => '/help',
   terms: () => '/terms',
   privacy: () => '/privacy',
+  dataDeletion: () => '/data-deletion',
   refunds: () => '/refunds',
   faqs: () => '/faqs',
   signIn: () => '/sign-in',

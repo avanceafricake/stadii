@@ -421,6 +421,10 @@ const FOOTER_GROUPS = [
     links: [
       { href: routes.privacy(), label: 'Privacy policy' },
       { href: routes.terms(), label: 'Terms of use' },
+      // Linked from the footer because Google Play expects the account
+      // deletion page to be reachable from the site, not only from the store
+      // listing.
+      { href: routes.dataDeletion(), label: 'Delete your account' },
       { href: routes.refunds(), label: 'Refund policy' },
       { href: routes.about(), label: 'About STADII' },
     ],

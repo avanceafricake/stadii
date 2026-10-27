@@ -115,6 +115,8 @@ export interface PlatformConfig {
   readonly gaShardMax: number;
   readonly transferOfferTtlHours: number;
   readonly maxHoldExtensions: number;
+  /** Grace period before an erasure request is actually carried out. */
+  readonly accountDeletionGraceDays: number;
   readonly featureFlags: Readonly<Record<string, boolean>>;
   readonly updatedAt: Instant;
   readonly updatedByUserId: UserId;
